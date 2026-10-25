@@ -1,0 +1,97 @@
+name: CI
+
+# Every push and every pull request: run the test suite, prove the published
+# pages match the source, and fetch the built site from a real server so a
+# broken path or MIME type fails here instead of on the live site.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Run the test suite
+        run: npm test
+      - name: Rebuild the site
+        run: node src/build.js
+      - name: The committed pages must match the source
+        run: |
+          if ! git diff --exit-code --stat; then
+            echo "::error::Generated files are out of date. Run 'npm run build' and commit the result."
+            exit 1
+          fi
+
+  site:
+    name: Built site serves
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Serve the site
+        run: |
+          node src/serve.js &
+          for _ in $(seq 1 50); do
+            curl -sf -o /dev/null http://127.0.0.1:8080/ && break
+            sleep 0.2
+          done
+      - name: Fetch every page and asset type
+        run: |
+          fail=0
+          check() {
+            got=$(curl -s -o /dev/null -w '%{http_code} %{content_type}' "http://127.0.0.1:8080$1")
+            code=${got%% *}
+            mime=${got#* }
+            case "$2" in
+              html) want='text/html' ;;
+              js)   want='text/javascript' ;;
+              json) want='application/json' ;;
+              svg)  want='image/svg+xml' ;;
+            esac
+            case "$code $mime" in
+              "200 $want"*) printf 'ok   %-46s %s\n' "$1" "$mime" ;;
+              *)            printf 'FAIL %-46s %s\n' "$1" "$got"; fail=1 ;;
+            esac
+          }
+
+          check / html
+          check /manifest.json json
+          check /docs/print-standard.html html
+          check /docs/design-notes.html html
+          check /assets/js/mechanism-page.js js
+          check /assets/js/viewer.js js
+          check /assets/vendor/three/three.module.js js
+          check /src/lib/export.js js
+
+          for page in mechanisms/*/index.html; do
+            check "/${page%/index.html}/" html
+          done
+          for card in assets/img/*.svg; do
+            check "/$card" svg
+          done
+
+          exit $fail
+      - name: Stop the server
+        if: always()
+        run: pkill -f 'node src/serve.js' || true

@@ -199,8 +199,9 @@ async function main() {
   }
   all.sort((a, b) => (a.order - b.order) || a.title.localeCompare(b.title));
 
+  // No build timestamp: the site has to rebuild byte-for-byte so CI can prove
+  // the committed pages match the source (see .github/workflows/ci.yml).
   await fs.writeFile(manifestPath, `${JSON.stringify({
-    generated: new Date().toISOString(),
     standard: { rod: 3, fit: 0.3, plateT: 4, bodyT: 6, layerPitch: 8 },
     mechanisms: all,
   }, null, 2)}\n`);
