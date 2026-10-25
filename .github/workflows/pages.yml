@@ -1,8 +1,12 @@
 name: Deploy to GitHub Pages
 
+# Production deploy: only the default branch, or a manual run. The site is
+# rebuilt and tested here rather than published from a checkout, so whatever is
+# live is what the current source produces.
+
 on:
   push:
-    branches: ['**']
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -13,7 +17,33 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  build:
+    name: Build the site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Run the test suite
+        run: npm test
+      - name: Build pages, cards and catalogue
+        run: node src/build.js
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+      - name: Collect the static site
+        run: |
+          mkdir -p "${RUNNER_TEMP}/site"
+          rsync -a --exclude='.git/' --exclude='.github/' --exclude='export/' ./ "${RUNNER_TEMP}/site/"
+          touch "${RUNNER_TEMP}/site/.nojekyll"
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ${{ runner.temp }}/site
+
   deploy:
+    name: Deploy
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -23,19 +53,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Check out the selected branch
-        uses: actions/checkout@v4
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-      - name: Prepare static site
-        run: |
-          mkdir -p "${RUNNER_TEMP}/site"
-          rsync -a --exclude='.git/' --exclude='.github/' ./ "${RUNNER_TEMP}/site/"
-          touch "${RUNNER_TEMP}/site/.nojekyll"
-      - name: Upload site
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ${{ runner.temp }}/site
-      - name: Deploy site
+      - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

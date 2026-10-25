@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mechanisms — motion you can print</title>
+<meta name="description" content="A catalogue of simple motion mechanisms: each one explained, animated in 3D, and printable, with its own parametric STL export.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><b>Mechanisms</b> <span>— motion you can print</span></a>
+    <nav>
+      <a href="index.html" aria-current="page">Catalogue</a>
+      <a href="docs/print-standard.html">Print standard</a>
+      <a href="docs/design-notes.html">Design notes</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="kicker">Interactive · parametric · 3D printable</div>
+      <h1>Every mechanism here is one page, one working model, one print pack.</h1>
+      <p class="lede">
+        Move the parts, change the numbers, watch what the mechanism does — then download the
+        exact geometry you were looking at. Each machine is drawn, simulated and exported from a
+        single model, in millimetres, flat on the bed, with no supports.
+      </p>
+    </div>
+    <aside>
+      <p><b>Start with the interaction.</b> Drag to orbit, move the slider, pick a part. The numbers
+        in the corner come from the same model that moves the parts.</p>
+      <p><b>Then print it.</b> The print pack holds one STL per part, the parameter sheet, the
+        hardware list and the mass estimate. Change a parameter and the pack changes with it.</p>
+    </aside>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="grid-head">
+    <h2>The catalogue</h2>
+    <p><span id="count">7</span> mechanisms · 35 printed parts · 1009 g of PLA in total</p>
+    <div class="filters" id="filters">
+        <button class="chip" type="button" data-filter="All" aria-pressed="true">All</button>
+        <button class="chip" type="button" data-filter="Physical computing" aria-pressed="false">Physical computing</button>
+        <button class="chip" type="button" data-filter="Rotary → timed lift" aria-pressed="false">Rotary → timed lift</button>
+        <button class="chip" type="button" data-filter="Rotary ↔ linear" aria-pressed="false">Rotary ↔ linear</button>
+        <button class="chip" type="button" data-filter="Rotary → rotary" aria-pressed="false">Rotary → rotary</button>
+        <button class="chip" type="button" data-filter="Intermittent feed" aria-pressed="false">Intermittent feed</button>
+        <button class="chip" type="button" data-filter="Intermittent index" aria-pressed="false">Intermittent index</button>
+        <button class="chip" type="button" data-filter="Rotary → linear" aria-pressed="false">Rotary → linear</button></div>
+  </div>
+  <div class="cards" id="cards">
+      <a class="cardlink" href="mechanisms/servo-crank/index.html" data-category="Physical computing">
+        <img class="thumb" src="assets/img/servo-crank.svg" alt="Servo crank — assembled, in isometric view" loading="lazy" width="900" height="700">
+        <div class="body">
+          <h3>Servo crank</h3>
+          <p class="q">A servo sweeps 0–180°, but a crank needs a full turn. What does a servo-driven crank actually give you, and how do you choose the arm length?</p>
+          <div class="tags">
+            <span class="tag">Physical computing</span>
+            <span class="tag">5 printed parts</span>
+            <span class="tag">113 g</span>
+            <span class="tag">4 parameters</span>
+          </div>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/cam-follower/index.html" data-category="Rotary → timed lift">
+        <img class="thumb" src="assets/img/cam-follower.svg" alt="Cam and roller follower — assembled, in isometric view" loading="lazy" width="900" height="700">
+        <div class="body">
+          <h3>Cam and roller follower</h3>
+          <p class="q">How can one steady rotation make a follower rise smoothly, dwell at the top, and come back down without a jolt — and what limits how fast it can do it?</p>
+          <div class="tags">
+            <span class="tag">Rotary → timed lift</span>
+            <span class="tag">5 printed parts</span>
+            <span class="tag">172 g</span>
+            <span class="tag">6 parameters</span>
+          </div>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/rack-pinion/index.html" data-category="Rotary ↔ linear">
+        <img class="thumb" src="assets/img/rack-pinion.svg" alt="Rack and pinion — assembled, in isometric view" loading="lazy" width="900" height="700">
+        <div class="body">
+          <h3>Rack and pinion</h3>
+          <p class="q">How does a gear drive something in a straight line, and what has to match for the teeth to run smoothly into each other?</p>
+          <div class="tags">
+            <span class="tag">Rotary ↔ linear</span>
+            <span class="tag">5 printed parts</span>
+            <span class="tag">210 g</span>
+            <span class="tag">4 parameters</span>
+          </div>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/gear-pair/index.html" data-category="Rotary → rotary">
+        <img class="thumb" src="assets/img/gear-pair.svg" alt="Spur gears — assembled, in isometric view" loading="lazy" width="900" height="700">
+        <div class="body">
+          <h3>Spur gears</h3>
+          <p class="q">Two gears mesh. What exactly decides how much slower the second one turns, and why do their teeth have that curve?</p>
+          <div class="tags">
+            <span class="tag">Rotary → rotary</span>
+            <span class="tag">4 printed parts</span>
+            <span class="tag">148 g</span>
+            <span class="tag">4 parameters</span>
+          </div>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/ratchet-pawl/index.html" data-category="Intermittent feed">
+        <img class="thumb" src="assets/img/ratchet-pawl.svg" alt="Ratchet and pawl — assembled, in isometric view" loading="lazy" width="900" height="700">
+        <div class="body">
+          <h3>Ratchet and pawl</h3>
+          <p class="q">How does a back-and-forth motion become a series of equal steps in one direction — and what stops the wheel running backwards between steps?</p>
+          <div class="tags">
+            <span class="tag">Intermittent feed</span>
+            <span class="tag">7 printed parts</span>
+            <span class="tag">126 g</span>
+            <span class="tag">4 parameters</span>
+          </div>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/geneva-indexer/index.html" data-category="Intermittent index">
+        <img class="thumb" src="assets/img/geneva-indexer.svg" alt="Geneva indexer — assembled, in isometric view" loading="lazy" width="900" height="700">
+        <div class="body">
+          <h3>Geneva indexer</h3>
+          <p class="q">How can one continuous rotation produce motion that stops dead for most of the cycle, and what sets how hard the wheel has to accelerate to get through a step?</p>
+          <div class="tags">
+            <span class="tag">Intermittent index</span>
+            <span class="tag">4 printed parts</span>
+            <span class="tag">108 g</span>
+            <span class="tag">3 parameters</span>
+          </div>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/crank-slider/index.html" data-category="Rotary → linear">
+        <img class="thumb" src="assets/img/crank-slider.svg" alt="Crank and slider — assembled, in isometric view" loading="lazy" width="900" height="700">
+        <div class="body">
+          <h3>Crank and slider</h3>
+          <p class="q">If the crank turns at a constant speed, why does the slider race through the middle of its stroke and stop dead at each end?</p>
+          <div class="tags">
+            <span class="tag">Rotary → linear</span>
+            <span class="tag">5 printed parts</span>
+            <span class="tag">131 g</span>
+            <span class="tag">3 parameters</span>
+          </div>
+        </div>
+      </a></div>
+
+  <section class="section" id="why">
+    <h2>Why these mechanisms first</h2>
+    <div class="cols">
+      <div>
+        <h3>They are the vocabulary of physical computing</h3>
+        <p>A servo horn becomes a crank, a crank becomes a slider, a slider becomes a rocker. Almost
+          every small machine you would build with a microcontroller — a plotter, a camera slider, a
+          robot leg, a feeder — is two or three of these movements joined together.</p>
+        <p>The catalogue starts with the movements you can hold in one hand, because those are the
+          ones you need to feel before a linkage diagram means anything.</p>
+      </div>
+      <div>
+        <h3>Each page is a machine, not an article</h3>
+        <p>One mechanism per page: the object, the controls, the cutaway, the numbers, and one
+          sentence that says what the whole thing is about. No diagram is decorative — every part
+          you see is a part in the STL beside it.</p>
+        <p>The breakdown is written from the model: the stroke really is twice the crank radius, the
+          rod ratio really does set the side load, the cam really does undercut when you push the
+          roller past the flank.</p>
+      </div>
+      <div>
+        <h3>Print packs, not just STLs</h3>
+        <p>Every page exports a ZIP: one STL per part, already flat on the bed and in millimetres;
+          a parameter sheet with the values you chose; a bill of materials with masses; and the
+          assembly order.</p>
+        <p>Repeated parts are printed once and listed with their quantity, so three identical caps
+          are one file, not three.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="standard">
+    <h2>The print standard</h2>
+    <div class="cols">
+      <div>
+        <p>Every kit in the catalogue shares one set of dimensions, so parts from different
+          mechanisms fit each other:</p>
+        <ul>
+          <li>Base plate <code>4 mm</code>; links, gears, cams and levers <code>6 mm</code>.</li>
+          <li>One turning layer every <code>8 mm</code>, each on its own <code>1.6 mm</code> hub.</li>
+          <li>Pivots are printed posts; parts are held on by press-fit caps.</li>
+          <li><code>0.3 mm</code> running clearance on every bore, <code>0.3 mm</code> interference on
+            every press fit.</li>
+          <li>Minimum <code>2.4 mm</code> wall around a bore, <code>1.6 mm</code> web elsewhere.</li>
+        </ul>
+      </div>
+      <div>
+        <p>Nothing in a pack needs supports, and nothing needs a screw. A kit is a plate, a few
+          links, a few caps and a printed post — plus, on some mechanisms, one bought rod.</p>
+        <p>Every STL is checked before it is written: each solid must be closed, wound outwards, and
+          free of overlaps with the other solids in the same part. The page will not publish a
+          mechanism that fails.</p>
+        <p><a href="docs/print-standard.html">Read the full standard →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="next">
+    <h2>What comes next</h2>
+    <div class="cols">
+      <div>
+        <h3>Next in the queue</h3>
+        <ul>
+          <li>Four-bar linkage — change the direction and length of a push</li>
+          <li>Bell crank — turn a pull through 90° without a cable</li>
+          <li>Spring return — the other half of every solenoid-driven mechanism</li>
+          <li>Scotch yoke — a dwell for free, at the cost of side load</li>
+          <li>Worm drive — a printed gearbox that will not back-drive</li>
+        </ul>
+      </div>
+      <div>
+        <h3>After that</h3>
+        <ul>
+          <li>Barrel cam and grooved cam — motion the roller cannot leave</li>
+          <li>Planetary stage — a printed gearbox for a hobby motor</li>
+          <li>Toggle clamp — the mechanism that locks itself</li>
+          <li>Bevel pair — gearing that turns a corner</li>
+          <li>Linkage explorer: drag any joint and read the coupler curve</li>
+        </ul>
+      </div>
+      <div>
+        <h3>How it is built</h3>
+        <p>Each mechanism is a small ES module: parameters, a <code>build()</code> that returns parts
+          in print-flat millimetres, a <code>pose()</code> that moves them, and the readouts. The page,
+          the card image and the STL export all read from that one module — no second copy of the
+          geometry anywhere.</p>
+        <p><a href="docs/design-notes.html">How the model and the export fit together →</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>Mechanisms — built on the anatomy craft rules: one object, real parts, true numbers.</span>
+    <span>Updated 2026-10-25</span>
+  </div>
+</footer>
+
+<script type="module">
+  const cards = document.getElementById('cards');
+  const buttons = [...document.querySelectorAll('[data-filter]')];
+  function apply(filter) {
+    const all = [...cards.children];
+    for (const card of all) {
+      const show = filter === 'All' || card.dataset.category === filter;
+      card.style.display = show ? '' : 'none';
+    }
+    for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.filter === filter));
+  }
+  for (const b of buttons) b.addEventListener('click', () => apply(b.dataset.filter));
+</script>
+</body>
+</html>

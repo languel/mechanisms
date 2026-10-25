@@ -1,0 +1,5 @@
+# generated print packs (regenerate with `npm run export`)
+export/
+# local OS noise
+.DS_Store
+node_modules/

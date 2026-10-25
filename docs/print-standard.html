@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The print standard · Mechanisms</title>
+<meta name="description" content="The one set of dimensions every mechanism in the catalogue shares, and the rules each exported part is checked against.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/site.css">
+<style>
+  .doc { max-width: 860px; margin: 0 auto; padding: 34px 22px 70px; }
+  .doc h1 { font-size: clamp(26px, 3vw, 36px); margin-bottom: 10px; }
+  .doc h2 { font-size: 20px; margin: 34px 0 10px; }
+  .doc h3 { font-size: 15px; margin: 22px 0 6px; }
+  .doc p, .doc li { font-size: 14px; color: var(--ink-soft); }
+  .doc li { margin-bottom: 6px; }
+  .doc table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; font-size: 13px; }
+  .doc th, .doc td { text-align: left; padding: 7px 9px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  .doc th { font-weight: 600; color: var(--ink); background: var(--paper-deep); }
+  .doc code { font: 500 12.5px/1 var(--mono); background: var(--paper-deep); padding: 2px 5px; border-radius: 4px; }
+  .doc .lede { font-family: var(--serif); font-size: 18px; line-height: 1.5; color: var(--ink); }
+  .doc .aside { border-left: 2px solid var(--accent); padding: 2px 0 2px 14px; margin: 18px 0; }
+  .doc .figure { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin: 16px 0; font-size: 13px; color: var(--muted); }
+  .doc a { color: var(--ink); }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><b>Mechanisms</b> <span>— motion you can print</span></a>
+    <nav>
+      <a href="../index.html">Catalogue</a>
+      <a href="print-standard.html" aria-current="page">Print standard</a>
+      <a href="design-notes.html">Design notes</a>
+    </nav>
+  </div>
+</header>
+
+<main class="doc">
+  <div class="crumbs" style="margin-bottom:14px"><a href="../index.html">Catalogue</a><span class="sep">/</span><span>Print standard</span></div>
+  <h1>The print standard</h1>
+  <p class="lede">Every mechanism in the catalogue is built from the same small vocabulary of
+    dimensions, so a post from one kit fits a cap from another, and anything you learn about one
+    machine applies to the next.</p>
+
+  <h2>1. The stack</h2>
+  <p>Parts are designed in millimetres, print-flat: <code>z = 0</code> is the bed face and
+    <code>+z</code> is up. The assembled machine stacks the same parts along <code>+z</code>, one
+    turning layer at a time.</p>
+  <table>
+    <tr><th>Element</th><th>Dimension</th><th>Why</th></tr>
+    <tr><td>Base plate</td><td>4 mm</td><td>Stiff enough for a 200 mm plate, prints in 20 layers.</td></tr>
+    <tr><td>Links, gears, cams, levers</td><td>6 mm</td><td>Three 0.4 mm perimeters plus infill; strong in the plane.</td></tr>
+    <tr><td>Turning layer pitch</td><td>8 mm</td><td>6 mm body + 1.6 mm hub + 0.4 mm running clearance.</td></tr>
+    <tr><td>Hub (stand-off boss)</td><td>1.6 mm tall</td><td>Lifts a part off the layer below without a bought spacer.</td></tr>
+    <tr><td>Pivot post</td><td>Ø6.8 mm, printed</td><td>Strong enough in PLA; a Ø3 rod fits the same bore.</td></tr>
+    <tr><td>Press cap</td><td>Ø13.2 mm × 3 mm</td><td>Holds a link on a post; 0.3 mm interference.</td></tr>
+  </table>
+
+  <h2>2. Fits</h2>
+  <table>
+    <tr><th>Fit</th><th>Nominal</th><th>Used for</th></tr>
+    <tr><td>Running</td><td>+0.30 mm on the post</td><td>Every bore that turns or slides. Adjustable per mechanism: 0.2 mm for a well-tuned printer, 0.5 mm for a loose one.</td></tr>
+    <tr><td>Press</td><td>−0.30 mm on the post</td><td>Caps, and anything meant to stay put. A drop of glue is allowed but usually unnecessary.</td></tr>
+    <tr><td>Clearance</td><td>0.35 mm per side</td><td>Where a part passes beside another: carriages between rails, racks through keepers.</td></tr>
+  </table>
+  <div class="aside">
+    <p><b>Fits are parametric, not fixed.</b> Each page exposes the clearance and re-cuts every
+      bore and every gap from it. If your printer runs tight, raise it and re-export — the STLs and
+      the sheet both follow.</p>
+  </div>
+
+  <h2>3. What counts as printable</h2>
+  <p>Before a page is published, every printed part is mesh-checked. A part is publishable when:</p>
+  <ul>
+    <li>every solid in it is <b>closed</b>: each directed edge is matched by the same number of its
+      reverse, so a slicer sees a closed surface;</li>
+    <li>every solid is <b>wound outwards</b>, proved by a positive signed volume;</li>
+    <li>no two solids in the same part <b>overlap</b> in both height and footprint — stacked bosses
+      may touch a plate, never sink into it, because the slicer's even-odd fill would carve the
+      overlap out of the part;</li>
+    <li>the profile <b>triangulates cleanly</b>: the cap area equals the area the rings enclose, which
+      catches a hole that has drifted across the outline (a real failure that the first version of
+      the cam generator produced);</li>
+    <li>it fits the bed: every part must be smaller than 220 mm in every direction.</li>
+  </ul>
+  <p>The same checks run in three places: in the page (every parameter change), in
+    <code>npm test</code> (at every parameter extreme of every mechanism), and in
+    <code>src/build.js</code> (before the page is written). The exports are float32-quantised to
+    0.1 µm first, so the vertices a slicer sees are bit-identical across a shared edge — the check
+    that the file is watertight is the same check a slicer runs.</p>
+
+  <h2>4. Orientation and supports</h2>
+  <p>Every STL is already in its printing orientation: flat face on the bed, tallest feature up. No
+    part needs supports. Bridges are kept under 16 mm (the rack keepers are 12 mm) and overhangs
+    stay below 50° except where they are short enough to print clean.</p>
+
+  <h2>5. Hardware</h2>
+  <p>Most kits need no bought parts at all: posts and pins are printed and retained by press caps.
+    Where a mechanism needs a real axle or a real servo, the page lists it in <b>Hardware</b> and the
+    sheet counts it. The two standard sizes are Ø3 mm rod (with 0.3 mm running clearance) and Ø2 mm
+    steel pin for the small linkages.</p>
+
+  <h2>6. Mass and time</h2>
+  <p>Each page reports the printed mass from the model's own volume at PLA density
+    (1.24 g/cm³) and the same figure appears in the pack, per part and in total. Add roughly
+    25–30 g per hour of printing on a 0.4 mm nozzle at 0.2 mm layers, 3 perimeters and 25%
+    infill.</p>
+
+  <div class="figure">
+    <b>Where these numbers came from.</b> The 8 mm layer pitch and the 0.3 mm running fit were
+    chosen by printing: a 6 mm link with a 1.6 mm hub clears the plate by the 0.4 mm left over,
+    and a Ø6.8 printed post in a Ø7.1 bore turns freely with no post-processing. Anything looser
+    rattles; anything tighter needs drilling, which defeats the point of a printable kit.
+  </div>
+
+  <p style="margin-top:26px"><a href="../index.html">← Back to the catalogue</a> ·
+    <a href="design-notes.html">How a mechanism is modelled and exported →</a></p>
+</main>
+
+<footer class="site">
+  <div class="wrap"><span>Mechanisms — one model per machine, shared by the page, the figure and the STL.</span></div>
+</footer>
+</body>
+</html>
