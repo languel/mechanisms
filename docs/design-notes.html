@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design notes · Mechanisms</title>
+<meta name="description" content="How each mechanism is modelled once — as parts in millimetres — and then drawn, animated and exported from that one model.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/site.css">
+<style>
+  .doc { max-width: 880px; margin: 0 auto; padding: 34px 22px 70px; }
+  .doc h1 { font-size: clamp(26px, 3vw, 36px); margin-bottom: 10px; }
+  .doc h2 { font-size: 20px; margin: 34px 0 10px; }
+  .doc h3 { font-size: 15px; margin: 20px 0 6px; }
+  .doc p, .doc li { font-size: 14px; color: var(--ink-soft); }
+  .doc li { margin-bottom: 6px; }
+  .doc code { font: 500 12.5px/1 var(--mono); background: var(--paper-deep); padding: 2px 5px; border-radius: 4px; }
+  .doc .lede { font-family: var(--serif); font-size: 18px; line-height: 1.5; color: var(--ink); }
+  .doc pre { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font: 500 12.5px/1.6 var(--mono); color: var(--ink); }
+  .doc .aside { border-left: 2px solid var(--accent); padding: 2px 0 2px 14px; margin: 18px 0; }
+  .doc a { color: var(--ink); }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 9px; border-bottom: 1px solid var(--line-soft); }
+  th { background: var(--paper-deep); font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><b>Mechanisms</b> <span>— motion you can print</span></a>
+    <nav>
+      <a href="../index.html">Catalogue</a>
+      <a href="print-standard.html">Print standard</a>
+      <a href="design-notes.html" aria-current="page">Design notes</a>
+    </nav>
+  </div>
+</header>
+
+<main class="doc">
+  <div class="crumbs" style="margin-bottom:14px"><a href="../index.html">Catalogue</a><span class="sep">/</span><span>Design notes</span></div>
+  <h1>One model, drawn three ways</h1>
+  <p class="lede">Each mechanism is a single ES module of parts in millimetres. The interactive stage,
+    the isometric card image and the STL export all read that module — there is no second copy of the
+    geometry anywhere in the project.</p>
+
+  <h2>Why it is built this way</h2>
+  <p>Most printable-mechanism projects run into the same wall: the animation is drawn by hand in
+    one coordinate system, the CAD model is built in another, and the STL comes from a third. Then a
+    parameter changes and the three drift apart — the picture still moves, but the export is wrong,
+    and nobody notices because nobody compares them.</p>
+  <p>Here the module <i>is</i> the comparison. A part is a list of extruded 2D profiles with a height
+    and a place in the stack. The viewer extrudes them into triangles. The exporter writes those same
+    triangles to STL. The card image culls and sorts those same faces. If the picture looks right and
+    the STL is wrong, that is a bug you can find, because both come from the same numbers.</p>
+
+  <h2>The shape of a mechanism module</h2>
+  <pre>export const meta = { slug, title, tagline, category, question, bigIdea, notes, references };
+export const params = [{ key, label, min, max, step, value, unit, help }];
+export const hardware = [{ name, qty, spec, note }];
+export const steps = [{ title, text, t, parts, set }];
+
+export function build(p) {
+  // parts in print-flat millimetres, stacked by `at.z`
+  return { parts, checks, g };
+}
+export function pose(p, t) {          // how every part moves at input angle t
+  return { crank: { rot: t }, slider: { dx: x(t) } };
+}
+export function readouts(p, t) {      // the numbers, from the same model
+  return [{ label: 'Slider', value, unit: 'mm' }];
+}</pre>
+
+  <h3>Parts</h3>
+  <p>A part carries its solids (in its own print-flat frame), the place it sits in the assembled
+    machine (<code>at</code>), the point it pivots about (<code>pivot</code>), and its role. Two
+    kinds exist: <code>print</code> parts, which are exported, and <code>hardware</code> parts, which
+    are drawn but never exported. Repeated parts share a <code>printId</code>, so the three identical
+    caps are one STL with a quantity of three.</p>
+
+  <h3>Pose</h3>
+  <p>Nothing about the geometry changes when the machine moves — every part is rigid, and the pose
+    only says how far each one has turned or slid. That is the real kinematic constraint of the
+    machines in this catalogue, and it means the stage is fast: the meshes are built once per
+    parameter change, and a frame is a handful of transform updates.</p>
+
+  <h3>Readouts</h3>
+  <p>Every number on the page is computed from the same functions that place the parts. The slider
+    position is the slider's own position, the ratio is the tooth counts that cut the gears, and the
+    cam's slope and curvature are finite differences of the law that generated the outline.</p>
+
+  <h2>How a part becomes an STL</h2>
+  <ol>
+    <li><b>Profiles.</b> Gear, rack, cam, ratchet, Geneva and pawl profiles are generated in
+      <code>src/lib/profiles.js</code>; plain plates, discs and links in <code>src/lib/kit.js</code>.</li>
+    <li><b>Extrude.</b> Each profile is sliced into horizontal bands at every vertex height. Inside a
+      band every edge is a straight segment, so pairing them left to right (even-odd) gives the solid
+      intervals between outline and holes. Each band boundary is split at every vertex on that line,
+      so neighbouring strips share vertices exactly and side walls can be taken straight from the
+      cap's own boundary edges. No T-junctions, and no dependence on hole-bridging or ear-clipping,
+      both of which failed here first.</li>
+    <li><b>Check.</b> Winding, closedness, overlap and area are verified per solid, per part, at every
+      parameter extreme, and before every page build.</li>
+    <li><b>Quantise.</b> Coordinates snap to 0.1 µm so the float32 STL is bit-identical along shared
+      edges.</li>
+    <li><b>Write.</b> Binary STL, millimetres, one file per printed part, zipped with a sheet and a
+      bill of materials.</li>
+  </ol>
+
+  <h2>What went wrong on the way (and what fixed it)</h2>
+  <table>
+    <tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr>
+    <tr>
+      <td>Meshes were not closed around holes</td>
+      <td>The triangulator bridged holes into the outline and then stalled on the pinch vertices the bridge creates.</td>
+      <td>Replaced with a scanline decomposition, which has no bridges to stall on. It also removed a 60-second hang.</td>
+    </tr>
+    <tr>
+      <td>A part looked fine but the mesh reported missing reverse edges</td>
+      <td>Caps and walls were built from different vertex sets: interpolation along a cap edge produced a vertex the wall ring did not contain.</td>
+      <td>Walls are now derived from the cap's boundary edges, and the scanline splits band lines at every vertex.</td>
+    </tr>
+    <tr>
+      <td>The cam triangulated to a smaller area than its outline enclosed</td>
+      <td>The cam outline doubled back on itself at angles the generator rounds off; the triangulator returned a plausible-looking but wrong result.</td>
+      <td>The triangulator now checks that the area it covers equals the area the rings enclose, and throws if not. The cam generator also reports undercut and folds.</td>
+    </tr>
+    <tr>
+      <td>The isometric card showed only the base plate</td>
+      <td>Faces were sorted near-to-far instead of far-to-near.</td>
+      <td>Sort direction fixed, and the base frame is now drawn before the parts standing on it, because a flat-shaded painter's sort cannot resolve a part that sits inside another's silhouette.</td>
+    </tr>
+    <tr>
+      <td>Gear teeth vanished into the plate</td>
+      <td>Interlocking teeth cannot be depth-sorted correctly with flat faces.</td>
+      <td>The parts that interlock (pinion, pawl) carry an explicit draw priority, so their near teeth are always legible.</td>
+    </tr>
+    <tr>
+      <td>The ZIP would not open in some tools</td>
+      <td>The buffer was allocated 22 bytes too long, leaving trailing zeros after the end-of-directory record.</td>
+      <td>A round-trip test reads the pack back with its own ZIP reader and verifies every CRC.</td>
+    </tr>
+  </table>
+
+  <h2>Testing</h2>
+  <p><code>npm test</code> runs three suites. The mesh suite builds every profile at every parameter
+    range and proves the solids are closed and the right volume. The mechanism suite builds every
+    mechanism at every parameter extreme and asserts printability, real readouts and valid steps. The
+    export suite round-trips the print pack, checks the ZIP, and proves that broken geometry is
+    reported rather than exported.</p>
+  <p><code>npm run build</code> regenerates every page, card and the catalogue; it refuses to publish a
+    mechanism whose pack fails. <code>npm run export</code> writes a pack per mechanism from the
+    command line, with any parameters you like:</p>
+  <pre>node src/export-cli.js cam-follower lift=12 rise=90 law=parabolic
+node src/export-cli.js --all --out=dist</pre>
+
+  <h2>Credits and sources</h2>
+  <p>The mechanisms are the classics: Henry T. Brown’s <i>Five Hundred and Seven Mechanical
+    Movements</i> (1868), the standard kinematics of the slider-crank, involute gears and cam
+    followers, and the anatomy craft rules for the isometric figures — one object, real parts, true
+    numbers, one lit accent. The follow-on list follows the physical-computing shelf: servos, cranks,
+    cams, racks, ratchets and indexers.</p>
+
+  <p style="margin-top:26px"><a href="../index.html">← Back to the catalogue</a> ·
+    <a href="print-standard.html">The print standard →</a></p>
+</main>
+
+<footer class="site">
+  <div class="wrap"><span>Mechanisms — one model per machine, shared by the page, the figure and the STL.</span></div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}} · Mechanisms</title>
+<meta name="description" content="{{description}}">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../assets/css/site.css">
+</head>
+<body data-mechanism="{{slug}}" data-module="./mechanism.js">
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="../../index.html"><b>Mechanisms</b> <span>— motion you can print</span></a>
+    <nav>
+      <a href="../../index.html">Catalogue</a>
+      <a href="../../docs/print-standard.html">Print standard</a>
+      <a href="../../docs/design-notes.html">Design notes</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap layout">
+  <section class="stage">
+    <div class="stage-head">
+      <div>
+        <div class="kicker" id="kicker">{{category}}</div>
+        <h1 id="title">{{title}}</h1>
+      </div>
+      <p class="tagline" id="tagline">{{tagline}}</p>
+    </div>
+
+    <div class="stage-card">
+      <div id="viewport">
+        <div id="fallback" aria-hidden="true">{{fallback}}</div>
+        <canvas id="stage-canvas"></canvas>
+        <div class="stage-tools">
+          <button class="chip" id="ghost" type="button" aria-pressed="false" title="Make the frame see-through">See inside</button>
+          <button class="chip" id="hardware" type="button" aria-pressed="true" title="Show or hide rods and collars">Hardware</button>
+          <button class="chip" id="reset" type="button" title="Back to the start">Reset</button>
+          <span class="chip" id="angle" title="Input shaft angle">0°</span>
+        </div>
+      </div>
+      <div class="stage-foot">
+        <div class="readouts" id="readouts"></div>
+        <div class="transport">
+          <button class="btn" id="play" type="button" aria-pressed="true"><span id="play-label">Pause</span></button>
+          <label class="scrub">Shaft
+            <input type="range" id="scrub" min="0" max="360" step="1" value="0" aria-label="Input shaft angle">
+          </label>
+          <label class="scrub" title="How fast the input shaft turns">
+            <input type="range" id="speed" min="0.02" max="0.4" step="0.01" value="0.14" aria-label="Speed">
+            <output id="speed-out">{{rpm}}</output>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <p class="bigidea" id="bigidea">{{bigIdea}}</p>
+
+    <noscript>
+      <div class="noscript">
+        The interactive stage needs JavaScript. The explanation, parameter table and print pack are all
+        rendered from the same model, so they are described in the panel beside it.
+      </div>
+    </noscript>
+  </section>
+
+  <aside class="panel">
+    <section class="card">
+      <h2>Print parameters <span class="hint">live model</span></h2>
+      <div id="params"></div>
+      <div class="checks" id="checks"></div>
+      <div class="param" style="margin-top:10px">
+        <label for="explode">Explode the stack</label>
+        <input type="range" id="explode" min="0" max="1" step="0.02" value="0" aria-label="Explode the stack">
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>The question</h2>
+      <p id="question" style="font-size:13.5px;color:var(--ink-soft)"></p>
+    </section>
+
+    <section class="card">
+      <h2>How it works</h2>
+      <ol class="steps" id="steps"></ol>
+    </section>
+
+    <section class="card">
+      <h2>Parts <span class="hint">click to inspect</span></h2>
+      <ul class="parts" id="parts"></ul>
+      <div id="part-detail" hidden style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)"></div>
+    </section>
+
+    <section class="card">
+      <h2>Print pack</h2>
+      <div id="export"></div>
+    </section>
+
+    <section class="card">
+      <h2>Hardware</h2>
+      <ul id="hardware-list" style="margin:0;padding-left:18px;font-size:12.5px;color:var(--ink-soft)"></ul>
+    </section>
+
+    <section class="card notes">
+      <h2>Breakdown</h2>
+      <div id="notes"></div>
+    </section>
+  </aside>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>Mechanisms — a catalogue of motion, drawn and modelled from the same numbers.</span>
+    <span><a href="../../index.html">All mechanisms</a> · <a href="../../docs/print-standard.html">Print standard</a></span>
+  </div>
+</footer>
+
+<div class="tooltip" id="tooltip"></div>
+<script type="module" src="../../assets/js/mechanism-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,376 @@
+{
+  "generated": "2026-10-25T21:30:49.954Z",
+  "standard": {
+    "rod": 3,
+    "fit": 0.3,
+    "plateT": 4,
+    "bodyT": 6,
+    "layerPitch": 8
+  },
+  "mechanisms": [
+    {
+      "slug": "servo-crank",
+      "title": "Servo crank",
+      "category": "Physical computing",
+      "tagline": "A servo holds an angle, not a speed. Half a crank circle is all it can give you — and that decides the whole motion.",
+      "question": "A servo sweeps 0–180°, but a crank needs a full turn. What does a servo-driven crank actually give you, and how do you choose the arm length?",
+      "bigIdea": "A servo crank is half a crank: the slider goes from the middle of its stroke to the end and back, so pick the arm radius for the stroke and the rod for the smoothness you can afford.",
+      "params": [
+        {
+          "key": "arm",
+          "label": "Arm radius",
+          "unit": "mm",
+          "min": 12,
+          "max": 30,
+          "value": 20
+        },
+        {
+          "key": "rod",
+          "label": "Rod length",
+          "unit": "mm",
+          "min": 46,
+          "max": 96,
+          "value": 68
+        },
+        {
+          "key": "sweep",
+          "label": "Servo sweep",
+          "unit": "°",
+          "min": 90,
+          "max": 180,
+          "value": 180
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 5,
+      "instances": 6,
+      "grams": 113.1,
+      "triangles": 4292,
+      "hardware": 4,
+      "bed": [
+        189,
+        92
+      ],
+      "order": 10
+    },
+    {
+      "slug": "cam-follower",
+      "title": "Cam and roller follower",
+      "category": "Rotary → timed lift",
+      "tagline": "A cam is a motion law you can hold: its shape is the timing diagram, wrapped around a shaft.",
+      "question": "How can one steady rotation make a follower rise smoothly, dwell at the top, and come back down without a jolt — and what limits how fast it can do it?",
+      "bigIdea": "You do not design a cam’s outline; you design its timing. The outline is just that timing wound round a shaft, pulled in by the roller radius.",
+      "params": [
+        {
+          "key": "lift",
+          "label": "Lift",
+          "unit": "mm",
+          "min": 4,
+          "max": 14,
+          "value": 8
+        },
+        {
+          "key": "rise",
+          "label": "Rise angle",
+          "unit": "°",
+          "min": 60,
+          "max": 200,
+          "value": 120
+        },
+        {
+          "key": "top",
+          "label": "Top dwell",
+          "unit": "°",
+          "min": 0,
+          "max": 140,
+          "value": 60
+        },
+        {
+          "key": "roller",
+          "label": "Shoe diameter",
+          "unit": "mm",
+          "min": 6,
+          "max": 16,
+          "value": 10
+        },
+        {
+          "key": "law",
+          "label": "Motion law",
+          "unit": "",
+          "min": null,
+          "max": null,
+          "value": "cycloidal"
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 5,
+      "instances": 6,
+      "grams": 172.1,
+      "triangles": 16176,
+      "hardware": 0,
+      "bed": [
+        168,
+        176
+      ],
+      "order": 20
+    },
+    {
+      "slug": "rack-pinion",
+      "title": "Rack and pinion",
+      "category": "Rotary ↔ linear",
+      "tagline": "A gear unrolled into a straight line: every radian of the pinion is one pitch radius of travel.",
+      "question": "How does a gear drive something in a straight line, and what has to match for the teeth to run smoothly into each other?",
+      "bigIdea": "The rack is the pinion’s pitch circle unrolled. Match the module and the tooth spacing lines up; the travel per turn is fixed by the pitch radius, not by the teeth you can see.",
+      "params": [
+        {
+          "key": "module",
+          "label": "Module",
+          "unit": "mm",
+          "min": 1.5,
+          "max": 3,
+          "value": 2
+        },
+        {
+          "key": "teeth",
+          "label": "Pinion teeth",
+          "unit": "",
+          "min": 12,
+          "max": 26,
+          "value": 18
+        },
+        {
+          "key": "stroke",
+          "label": "Rack stroke",
+          "unit": "mm",
+          "min": 24,
+          "max": 80,
+          "value": 56
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 5,
+      "instances": 6,
+      "grams": 210.4,
+      "triangles": 8448,
+      "hardware": 0,
+      "bed": [
+        220,
+        168
+      ],
+      "order": 30
+    },
+    {
+      "slug": "gear-pair",
+      "title": "Spur gears",
+      "category": "Rotary → rotary",
+      "tagline": "A ratio you can count: the teeth do the arithmetic, in whole numbers.",
+      "question": "Two gears mesh. What exactly decides how much slower the second one turns, and why do their teeth have that curve?",
+      "bigIdea": "Teeth are a counting device. The ratio is the tooth counts, the centre distance is the module, and the involute curve is what keeps the speed steady while one tooth hands over to the next.",
+      "params": [
+        {
+          "key": "driver",
+          "label": "Driver teeth",
+          "unit": "",
+          "min": 12,
+          "max": 32,
+          "value": 18
+        },
+        {
+          "key": "driven",
+          "label": "Driven teeth",
+          "unit": "",
+          "min": 16,
+          "max": 44,
+          "value": 36
+        },
+        {
+          "key": "module",
+          "label": "Module",
+          "unit": "mm",
+          "min": 1.5,
+          "max": 2.5,
+          "value": 2
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 4,
+      "instances": 5,
+      "grams": 148,
+      "triangles": 19136,
+      "hardware": 0,
+      "bed": [
+        168,
+        132
+      ],
+      "order": 40
+    },
+    {
+      "slug": "ratchet-pawl",
+      "title": "Ratchet and pawl",
+      "category": "Intermittent feed",
+      "tagline": "A lever that swings both ways, driving a wheel that only turns one way.",
+      "question": "How does a back-and-forth motion become a series of equal steps in one direction — and what stops the wheel running backwards between steps?",
+      "bigIdea": "Each tooth is a one-way door: a steep face to push against and a long slope for the pawl to climb. One pawl drives, a second one holds, and the wheel advances one tooth per stroke.",
+      "params": [
+        {
+          "key": "teeth",
+          "label": "Teeth",
+          "unit": "",
+          "min": 8,
+          "max": 20,
+          "value": 12
+        },
+        {
+          "key": "wheel",
+          "label": "Wheel diameter",
+          "unit": "mm",
+          "min": 48,
+          "max": 76,
+          "value": 62
+        },
+        {
+          "key": "swing",
+          "label": "Lever swing",
+          "unit": "°",
+          "min": 24,
+          "max": 64,
+          "value": 36
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 7,
+      "instances": 9,
+      "grams": 125.9,
+      "triangles": 5812,
+      "hardware": 0,
+      "bed": [
+        180,
+        106
+      ],
+      "order": 50
+    },
+    {
+      "slug": "geneva-indexer",
+      "title": "Geneva indexer",
+      "category": "Intermittent index",
+      "tagline": "One steady turn in, four dead stops out — the mechanism behind film projectors and assembly tables.",
+      "question": "How can one continuous rotation produce motion that stops dead for most of the cycle, and what sets how hard the wheel has to accelerate to get through a step?",
+      "bigIdea": "The driver does two jobs with two features: the pin moves the wheel, and the round boss locks it. The locking arc is why the output is truly stopped, not just slow.",
+      "params": [
+        {
+          "key": "slots",
+          "label": "Slots",
+          "unit": "",
+          "min": 3,
+          "max": 8,
+          "value": 4
+        },
+        {
+          "key": "wheel",
+          "label": "Wheel diameter",
+          "unit": "mm",
+          "min": 48,
+          "max": 88,
+          "value": 64
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 4,
+      "instances": 5,
+      "grams": 108.3,
+      "triangles": 5104,
+      "hardware": 0,
+      "bed": [
+        148.6697,
+        104
+      ],
+      "order": 60
+    },
+    {
+      "slug": "crank-slider",
+      "title": "Crank and slider",
+      "category": "Rotary → linear",
+      "tagline": "One part turns, the other can only slide. Everything about an engine follows from the link between them.",
+      "question": "If the crank turns at a constant speed, why does the slider race through the middle of its stroke and stop dead at each end?",
+      "bigIdea": "The slider only sees the part of the crank pin’s circle that points along the rails, so its speed rises and falls twice per turn while the crank never changes pace.",
+      "params": [
+        {
+          "key": "stroke",
+          "label": "Stroke",
+          "unit": "mm",
+          "min": 18,
+          "max": 60,
+          "value": 34
+        },
+        {
+          "key": "rod",
+          "label": "Rod length",
+          "unit": "mm",
+          "min": 44,
+          "max": 116,
+          "value": 80
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 5,
+      "instances": 7,
+      "grams": 130.7,
+      "triangles": 6444,
+      "hardware": 0,
+      "bed": [
+        182,
+        98
+      ],
+      "order": 100
+    }
+  ]
+}
