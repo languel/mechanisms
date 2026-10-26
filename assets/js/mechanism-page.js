@@ -43,6 +43,31 @@ const el = (tag, props = {}, ...kids) => {
   return node;
 };
 
+/* --------------------------------------------------------------- dark mode */
+
+const savedTheme = (typeof localStorage !== 'undefined' ? localStorage.getItem('theme-mode') : null)
+  || (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+if (savedTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+
+const themeModeBtn = $('#theme-mode-btn');
+if (themeModeBtn) {
+  themeModeBtn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+  themeModeBtn.addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const next = isDark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    if (typeof localStorage !== 'undefined') localStorage.setItem('theme-mode', next);
+    themeModeBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+    if (viewer) {
+      viewer.setViewState({ isDark: next === 'dark' });
+      applyPose();
+    }
+    if (state.viewMode !== '3d') {
+      renderStageOverlay();
+    }
+  });
+}
+
 /* ------------------------------------------------------------------ state */
 
 const params = mod.params;
@@ -94,7 +119,10 @@ try {
       tooltip.classList.add('on');
     },
   });
-  viewer.setViewState({ showHardware: true });
+  viewer.setViewState({
+    showHardware: true,
+    isDark: document.documentElement.getAttribute('data-theme') === 'dark',
+  });
 } catch (err) {
   console.warn('3D stage unavailable, showing the isometric figure:', err);
   live3d = false;
@@ -145,6 +173,7 @@ function build() {
     hideBase: state.hideBase,
     patent: state.patent,
     colorTheme: state.colorTheme,
+    isDark: document.documentElement.getAttribute('data-theme') === 'dark',
   });
   viewer.applyPose(mod.pose(values, state.t));
 
@@ -317,6 +346,7 @@ function renderStageOverlay() {
     const azDeg = (azRad / DEG) - 90;
     const elDeg = Math.max(-55, Math.min(55, (elRad / DEG) * 0.62));
     const isPatent = state.patent || state.colorTheme === 'patent';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
     const fig = renderTeardownSvg(visibleParts, pose, {
       camera: { azimuth: azDeg, elevation: elDeg, roll: 0 },
@@ -327,6 +357,7 @@ function renderStageOverlay() {
       preset: state.linework,
       fill: !isPatent,
       background: null,
+      ink: isDark ? '#dcd6c8' : '#1e1c19',
     });
     const toolbar = el('div', { class: 'bp-bar' },
       el('span', { class: 'bp-title' }, isPatent ? 'PATENT INK LINEWORK · PURE HLR WIREFRAME' : 'TEARDOWN HLR PROJECTION · ISO 128 LINEWORK'),
@@ -431,11 +462,13 @@ function buildPrintBedSvg() {
   const bedLayout = getBedPlacements();
   const { bedW: BED, placements } = bedLayout;
   const isLaser = state.bedMode === 'laser';
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
+  const gridStroke = isDark ? '#332e26' : '#dfd6c5';
   const gridLines = [];
   for (let g = 20; g < BED; g += 20) {
-    gridLines.push(`<line x1="${g}" y1="0" x2="${g}" y2="${BED}" stroke="#dfd6c5" stroke-width="0.4"/>`);
-    gridLines.push(`<line x1="0" y1="${g}" x2="${BED}" y2="${g}" stroke="#dfd6c5" stroke-width="0.4"/>`);
+    gridLines.push(`<line x1="${g}" y1="0" x2="${g}" y2="${BED}" stroke="${gridStroke}" stroke-width="0.4"/>`);
+    gridLines.push(`<line x1="0" y1="${g}" x2="${BED}" y2="${g}" stroke="${gridStroke}" stroke-width="0.4"/>`);
   }
 
   const partNodes = placements.map((pl, idx) => {
@@ -449,21 +482,25 @@ function buildPrintBedSvg() {
       const cutD = [...cutPaths, ...holePaths].filter(Boolean).join(' ');
       const etchD = etchPaths.filter(Boolean).join(' ');
       return `<g class="bed-part">
-        ${cutD ? `<path d="${cutD}" fill="#e01b24" fill-opacity="0.06" fill-rule="evenodd" stroke="#e01b24" stroke-width="0.7"/>` : ''}
-        ${etchD ? `<path d="${etchD}" fill="none" stroke="#1c71d8" stroke-width="0.55" stroke-dasharray="1.6 1.0"/>` : ''}
-        <text x="${cx}" y="${cy}" text-anchor="middle" font-family="ui-monospace, monospace" font-size="3.8" font-weight="600" fill="#2b7a4b">${part.name}${qty > 1 ? ` #${copyIndex}` : ''}</text>
+        ${cutD ? `<path d="${cutD}" fill="#e01b24" fill-opacity="${isDark ? '0.12' : '0.06'}" fill-rule="evenodd" stroke="#e01b24" stroke-width="0.7"/>` : ''}
+        ${etchD ? `<path d="${etchD}" fill="none" stroke="${isDark ? '#5c9ce6' : '#1c71d8'}" stroke-width="0.55" stroke-dasharray="1.6 1.0"/>` : ''}
+        <text x="${cx}" y="${cy}" text-anchor="middle" font-family="ui-monospace, monospace" font-size="3.8" font-weight="600" fill="${isDark ? '#5bb87d' : '#2b7a4b'}">${part.name}${qty > 1 ? ` #${copyIndex}` : ''}</text>
       </g>`;
     }
+
+    const partStroke = isDark ? '#ded8cc' : '#23201c';
+    const textFill = isDark ? '#ded8cc' : '#23201c';
+    const subTextFill = isDark ? '#9e968a' : '#5b5349';
 
     const outerD = [...cutPaths, ...holePaths].filter(Boolean).join(' ');
     const bossD = etchPaths.filter(Boolean).join(' ');
     return `<g class="bed-part">
       ${outerD
-        ? `<path d="${outerD}" fill="${themedColor}" fill-opacity="0.55" fill-rule="evenodd" stroke="#23201c" stroke-width="0.8"/>`
-        : `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${themedColor}" fill-opacity="0.45" stroke="#23201c" stroke-width="0.8"/>`}
-      ${bossD ? `<path d="${bossD}" fill="none" stroke="#23201c" stroke-width="0.5" stroke-opacity="0.65" stroke-dasharray="1.4 0.9"/>` : ''}
-      <text x="${cx}" y="${(Number(cy) - 1.5).toFixed(1)}" text-anchor="middle" font-family="ui-monospace, monospace" font-size="4.2" font-weight="600" fill="#23201c">${idx + 1}. ${part.name}${qty > 1 ? ` #${copyIndex}` : ''}</text>
-      <text x="${cx}" y="${(Number(cy) + 3.5).toFixed(1)}" text-anchor="middle" font-family="ui-monospace, monospace" font-size="3.4" fill="#5b5349">${s.size[0].toFixed(0)}×${s.size[1].toFixed(0)}×${s.size[2].toFixed(1)}mm</text>
+        ? `<path d="${outerD}" fill="${themedColor}" fill-opacity="${isDark ? '0.72' : '0.55'}" fill-rule="evenodd" stroke="${partStroke}" stroke-width="0.75"/>`
+        : `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${themedColor}" fill-opacity="${isDark ? '0.62' : '0.45'}" stroke="${partStroke}" stroke-width="0.75"/>`}
+      ${bossD ? `<path d="${bossD}" fill="none" stroke="${partStroke}" stroke-width="0.5" stroke-opacity="0.65" stroke-dasharray="1.4 0.9"/>` : ''}
+      <text x="${cx}" y="${(Number(cy) - 1.5).toFixed(1)}" text-anchor="middle" font-family="ui-monospace, monospace" font-size="4.2" font-weight="600" fill="${textFill}">${idx + 1}. ${part.name}${qty > 1 ? ` #${copyIndex}` : ''}</text>
+      <text x="${cx}" y="${(Number(cy) + 3.5).toFixed(1)}" text-anchor="middle" font-family="ui-monospace, monospace" font-size="3.4" fill="${subTextFill}">${s.size[0].toFixed(0)}×${s.size[1].toFixed(0)}×${s.size[2].toFixed(1)}mm</text>
     </g>`;
   });
 
@@ -471,11 +508,15 @@ function buildPrintBedSvg() {
     ? `220 × 220 MM LASER-CUT SHEET (1:1 MM) · RED = THROUGH-CUT · BLUE DASHED = SCORE / MULTI-TIER BOSS`
     : `220 × 220 MM 3D PRINT BED (${placements.length} PART INSTANCES NESTED FLAT AT Z = 0 MM)`;
 
+  const bedBg = isDark ? '#23201d' : '#faf6ee';
+  const bedBorder = isDark ? '#454037' : '#23201c';
+  const footerColor = isDark ? '#9e968a' : '#6b6257';
+
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 240 242" width="540" height="540">
-    <rect x="0" y="0" width="${BED}" height="${BED}" rx="5" fill="#faf6ee" stroke="#23201c" stroke-width="1.1"/>
+    <rect x="0" y="0" width="${BED}" height="${BED}" rx="5" fill="${bedBg}" stroke="${bedBorder}" stroke-width="1.1"/>
     ${gridLines.join('')}
     ${partNodes.join('')}
-    <text x="${BED / 2}" y="${BED + 8.5}" text-anchor="middle" font-family="ui-monospace, monospace" font-size="4.8" fill="#6b6257">${footerText}</text>
+    <text x="${BED / 2}" y="${BED + 8.5}" text-anchor="middle" font-family="ui-monospace, monospace" font-size="4.8" fill="${footerColor}">${footerText}</text>
   </svg>`;
 }
 
@@ -485,6 +526,7 @@ function downloadBlueprintSvg() {
   const azDeg = ((viewer.azimuth ?? -0.62) / DEG) - 90;
   const elDeg = Math.max(-55, Math.min(55, ((viewer.elevation ?? 0.78) / DEG) * 0.62));
   const isPatent = state.patent || state.colorTheme === 'patent';
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const themedParts = currentParts.map((p) => ({ ...p, color: resolvePartColor(p, state.colorTheme) }));
   const fig = renderTeardownSvg(themedParts, pose, {
     camera: { azimuth: azDeg, elevation: elDeg, roll: 0 },
@@ -493,7 +535,8 @@ function downloadBlueprintSvg() {
     hardware: state.hardware,
     preset: state.linework,
     fill: !isPatent,
-    background: '#f6f1e7',
+    background: isDark ? '#1b1917' : '#f6f1e7',
+    ink: isDark ? '#dcd6c8' : '#1e1c19',
     title: `${mod.meta.title} — Teardown technical blueprint`,
   });
   download(fig.svg, `${slug}-teardown-blueprint.svg`, 'image/svg+xml');

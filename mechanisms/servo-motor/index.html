@@ -5,10 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Positional servo motor · Mechanisms</title>
 <meta name="description" content="How does a 3-wire hobby servo know its exact shaft angle — and how does a 1000–2000 µs pulse tell the internal DC motor when to spin and when to stop?">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
 <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../../assets/vendor/katex/katex.min.css">
 <link rel="stylesheet" href="../../assets/css/site.css">
+<script>
+(function() {
+  const s = localStorage.getItem('theme-mode') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  if (s === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
 <script defer src="../../assets/vendor/katex/katex.min.js"></script>
 <script defer src="../../assets/vendor/katex/contrib/auto-render.min.js"></script>
 </head>
@@ -66,7 +72,7 @@
       
       [data-line-role="outline"] { stroke-width: 0.88px !important; stroke: #1e1c19 !important; stroke-linecap: round; }
       [data-line-role="edge"] { stroke-width: 0.58px !important; stroke: #1e1c19 !important; stroke-linecap: round; }
-      [data-line-role="detail"] { stroke-width: 0.35px !important; stroke: #2a2622 !important; }
+      [data-line-role="detail"] { stroke-width: 0.35px !important; stroke: #1e1c19 !important; stroke-opacity: 0.65; }
   
       [data-line-role="axis"] {
         stroke: #8a7f70;
@@ -91,8 +97,8 @@
       [data-fill="cap-idler"] { fill: url(#hatch-3); stroke: none; }
       
       #part-frame [data-line-role], [id^="part-frame"] [data-line-role], [id*="-frame"] [data-line-role] {
-        stroke: #92897c !important;
-        stroke-opacity: 0.25 !important;
+        stroke: #1e1c19 !important;
+        stroke-opacity: 0.22 !important;
         stroke-width: 0.15px !important;
       }
   

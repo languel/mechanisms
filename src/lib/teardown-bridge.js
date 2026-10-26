@@ -291,14 +291,14 @@ export function renderTeardownSvg(parts, pose = {}, {
   const prominentLineCss = prominentLines ? `
       [data-line-role="outline"] { stroke-width: 0.88px !important; stroke: ${ink} !important; stroke-linecap: round; }
       [data-line-role="edge"] { stroke-width: 0.58px !important; stroke: ${ink} !important; stroke-linecap: round; }
-      [data-line-role="detail"] { stroke-width: 0.35px !important; stroke: #2a2622 !important; }
+      [data-line-role="detail"] { stroke-width: 0.35px !important; stroke: ${ink} !important; stroke-opacity: 0.65; }
   ` : '';
 
   // Highlight driver / active parts with subtle colored linework; hairline thin baseplate
   const partStrokeRules = `
       #part-frame [data-line-role], [id^="part-frame"] [data-line-role], [id*="-frame"] [data-line-role] {
-        stroke: #92897c !important;
-        stroke-opacity: 0.25 !important;
+        stroke: ${ink} !important;
+        stroke-opacity: 0.22 !important;
         stroke-width: 0.15px !important;
       }
   ` + parts.map((p) => {

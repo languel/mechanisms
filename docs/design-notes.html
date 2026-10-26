@@ -5,9 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Design notes · Mechanisms</title>
 <meta name="description" content="How each mechanism is modelled once — as parts in millimetres — and then drawn, animated and exported from that one model.">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../assets/css/site.css">
+<script>
+(function() {
+  const s = localStorage.getItem('theme-mode') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  if (s === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
 <style>
   .doc { max-width: 880px; margin: 0 auto; padding: 34px 22px 70px; }
   .doc h1 { font-size: clamp(26px, 3vw, 36px); margin-bottom: 10px; }
@@ -169,5 +175,20 @@ node src/export-cli.js --all --out=dist</pre>
 <footer class="site">
   <div class="wrap"><span>Mechanisms — one model per machine, shared by the page, the figure and the STL.</span></div>
 </footer>
+<script>
+(function() {
+  const btn = document.getElementById('theme-mode-btn');
+  if (btn) {
+    btn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    btn.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const next = isDark ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme-mode', next);
+      btn.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+  }
+})();
+</script>
 </body>
 </html>

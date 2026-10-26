@@ -43,6 +43,7 @@ export class Viewer {
     this.patent = false;
     this.colorTheme = 'sky-gold';
     this.showHardware = true;
+    this.isDark = (typeof document !== 'undefined') && document.documentElement.getAttribute('data-theme') === 'dark';
     this.selected = null;
     this.hovered = null;
     this.motorMount = null;
@@ -87,8 +88,8 @@ export class Viewer {
   }
 
   buildLights() {
-    const hemi = new THREE.HemisphereLight(0xfffcf5, 0xcbbfae, 1.18);
-    this.scene.add(hemi);
+    this.hemi = new THREE.HemisphereLight(0xfffcf5, 0xcbbfae, 1.18);
+    this.scene.add(this.hemi);
 
     const key = new THREE.DirectionalLight(0xfff6ea, 1.48);
     key.position.set(-95, 190, 130);
@@ -104,22 +105,39 @@ export class Viewer {
     key.shadow.bias = -0.0006;
     key.shadow.normalBias = 0.6;
     this.scene.add(key);
-    this.key = key;
+    this.keyLight = key;
 
-    const fill = new THREE.DirectionalLight(0xdfe8ff, 0.55);
-    fill.position.set(140, 95, -110);
-    this.scene.add(fill);
+    this.fillLight = new THREE.DirectionalLight(0xdfe8ff, 0.55);
+    this.fillLight.position.set(140, 95, -110);
+    this.scene.add(this.fillLight);
 
     // Underside fill light so bottom faces are clearly lit when peeking from below
-    const under = new THREE.DirectionalLight(0xfff5e4, 0.62);
-    under.position.set(45, -190, -85);
-    this.scene.add(under);
+    this.underLight = new THREE.DirectionalLight(0xfff5e4, 0.62);
+    this.underLight.position.set(45, -190, -85);
+    this.scene.add(this.underLight);
+    this.updateLights();
+  }
+
+  updateLights() {
+    if (this.isDark) {
+      if (this.hemi) { this.hemi.color.setHex(0xe8e2d8); this.hemi.groundColor.setHex(0x322e28); this.hemi.intensity = 1.05; }
+      if (this.keyLight) { this.keyLight.color.setHex(0xfff6eb); this.keyLight.intensity = 1.38; }
+      if (this.fillLight) { this.fillLight.color.setHex(0x8fa2b5); this.fillLight.intensity = 0.52; }
+      if (this.underLight) { this.underLight.intensity = 0.45; }
+      if (this.tablePlane) { this.tablePlane.material.opacity = 0.35; this.tablePlane.material.color.setHex(0x020202); }
+    } else {
+      if (this.hemi) { this.hemi.color.setHex(0xfffcf5); this.hemi.groundColor.setHex(0xcbbfae); this.hemi.intensity = 1.18; }
+      if (this.keyLight) { this.keyLight.color.setHex(0xfff6ea); this.keyLight.intensity = 1.48; }
+      if (this.fillLight) { this.fillLight.color.setHex(0xdfe8ff); this.fillLight.intensity = 0.55; }
+      if (this.underLight) { this.underLight.intensity = 0.62; }
+      if (this.tablePlane) { this.tablePlane.material.opacity = 0.13; this.tablePlane.material.color.setHex(0x4a3b28); }
+    }
   }
 
   buildTable() {
     const plane = new THREE.Mesh(
       new THREE.PlaneGeometry(900, 900),
-      new THREE.ShadowMaterial({ opacity: 0.13, color: 0x4a3b28 }),
+      new THREE.ShadowMaterial({ opacity: this.isDark ? 0.35 : 0.13, color: this.isDark ? 0x020202 : 0x4a3b28 }),
     );
     plane.rotation.x = -Math.PI / 2;
     plane.position.y = -0.35;
@@ -143,10 +161,10 @@ export class Viewer {
       const geo = geometryFor(part);
       if (!geo) continue;
       const isFrame = part.role === 'frame' || part.id === 'frame';
-      const baseColor = isFrame ? '#eee8dc' : (part.color || '#c8bda9');
+      const baseColor = isFrame ? (this.isDark ? '#262420' : '#eee8dc') : (part.color || '#c8bda9');
       const material = new THREE.MeshStandardMaterial({
         color: new THREE.Color(baseColor),
-        roughness: part.kind === 'hardware' ? 0.35 : (isFrame ? 0.85 : 0.65),
+        roughness: part.kind === 'hardware' ? 0.35 : (isFrame ? 0.88 : 0.65),
         metalness: part.kind === 'hardware' ? 0.72 : 0.04,
         flatShading: true,
         transparent: true,
@@ -165,9 +183,9 @@ export class Viewer {
       // Crisp technical drafting feature edges on every 3D part
       const edgesGeo = new THREE.EdgesGeometry(geo, 22);
       const edgeMat = new THREE.LineBasicMaterial({
-        color: 0x231f1b,
+        color: this.isDark ? (isFrame ? 0x484236 : 0x181614) : 0x231f1b,
         transparent: true,
-        opacity: isFrame ? 0.22 : 0.44,
+        opacity: isFrame ? (this.isDark ? 0.28 : 0.22) : 0.44,
       });
       const edgeLines = new THREE.LineSegments(edgesGeo, edgeMat);
       mesh.add(edgeLines);
@@ -346,7 +364,11 @@ export class Viewer {
     }
   }
 
-  setViewState({ explode, ghost, hideBase, patent, colorTheme, showHardware, selected, hovered }) {
+  setViewState({ explode, ghost, hideBase, patent, colorTheme, showHardware, selected, hovered, isDark }) {
+    if (typeof isDark === 'boolean') {
+      this.isDark = isDark;
+      this.updateLights();
+    }
     if (typeof explode === 'number') this.explode = explode;
     if (typeof ghost === 'boolean') this.ghost = ghost;
     if (typeof hideBase === 'boolean') this.hideBase = hideBase;
@@ -363,16 +385,29 @@ export class Viewer {
     for (const [id, { part, material, mesh, edgeMat }] of this.meshes) {
       const isHi = id === this.selected || id === this.hovered;
       const isFrame = part.role === 'frame' || part.id === 'frame';
-      const themedColor = resolvePartColor(part, this.colorTheme);
+      let themedColor = resolvePartColor(part, this.colorTheme);
+      if (isFrame && this.isDark && !effectivePatent) {
+        themedColor = '#262420';
+      }
 
       if (effectivePatent) {
-        // Patent Line-Drawing Mode: flat warm parchment fills + crisp dark iron-gall ink edges
-        material.color.set(isHi ? '#f5e1d3' : '#faf6ee');
-        material.emissive.set(isHi ? '#e8834a' : '#faf6ee');
-        material.emissiveIntensity = isHi ? 0.28 : 0.62;
-        if (edgeMat) {
-          edgeMat.color.setHex(isHi ? 0xc2571f : 0x1a1714);
-          edgeMat.opacity = (this.ghost && isFrame) ? 0.18 : (isFrame ? 0.55 : 0.95);
+        // Patent Line-Drawing Mode: flat warm fills + crisp ink edges
+        if (this.isDark) {
+          material.color.set(isHi ? '#3a2e26' : '#22201d');
+          material.emissive.set(isHi ? '#e8834a' : '#1c1a17');
+          material.emissiveIntensity = isHi ? 0.35 : 0.45;
+          if (edgeMat) {
+            edgeMat.color.setHex(isHi ? 0xff9d5c : 0xd8d2c4);
+            edgeMat.opacity = (this.ghost && isFrame) ? 0.18 : (isFrame ? 0.55 : 0.95);
+          }
+        } else {
+          material.color.set(isHi ? '#f5e1d3' : '#faf6ee');
+          material.emissive.set(isHi ? '#e8834a' : '#faf6ee');
+          material.emissiveIntensity = isHi ? 0.28 : 0.62;
+          if (edgeMat) {
+            edgeMat.color.setHex(isHi ? 0xc2571f : 0x1a1714);
+            edgeMat.opacity = (this.ghost && isFrame) ? 0.18 : (isFrame ? 0.55 : 0.95);
+          }
         }
       } else {
         material.color.set(themedColor);
@@ -388,8 +423,8 @@ export class Viewer {
           material.emissive = new THREE.Color('#000000');
           material.emissiveIntensity = 0;
           if (edgeMat) {
-            edgeMat.color.setHex(0x231f1b);
-            edgeMat.opacity = this.ghost && isFrame ? 0.10 : (isFrame ? 0.22 : 0.44);
+            edgeMat.color.setHex(this.isDark ? (isFrame ? 0x484236 : 0x181614) : 0x231f1b);
+            edgeMat.opacity = this.ghost && isFrame ? 0.10 : (isFrame ? (this.isDark ? 0.28 : 0.22) : 0.44);
           }
         }
       }

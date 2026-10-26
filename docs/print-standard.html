@@ -5,9 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Illustrated Print Standard · Mechanisms</title>
 <meta name="description" content="Illustrated visual reference for every dimension, fit, shaft bore, and mesh rule shared across the printable Mechanisms &amp; Motors catalogue.">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../assets/css/site.css">
+<script>
+(function() {
+  const s = localStorage.getItem('theme-mode') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  if (s === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
 <style>
   .doc { max-width: 1080px; margin: 0 auto; padding: 34px 22px 70px; }
   .doc h1 { font-size: clamp(28px, 3.2vw, 38px); margin-bottom: 10px; }
@@ -347,5 +353,20 @@
     <a href="https://507movements.com/" target="_blank" rel="noopener">Inspired by 507movements.com ↗</a>
   </div>
 </footer>
+<script>
+(function() {
+  const btn = document.getElementById('theme-mode-btn');
+  if (btn) {
+    btn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    btn.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const next = isDark ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme-mode', next);
+      btn.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+  }
+})();
+</script>
 </body>
 </html>
