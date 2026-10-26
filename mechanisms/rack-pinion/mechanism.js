@@ -146,8 +146,21 @@ export function build(p) {
     ticks.push(rect(-half + i - 0.55, rackY - RACK_H - 14, 1.1, major ? 4.5 : 2.6));
   }
 
-  // Rear guide wall supports the back of the rack along the stroke
-  const backGuideY = rackY - RACK_H - 5.4;
+  // Compact bridge keepers at either end of the stroke
+  const tunnelY0 = rackY - RACK_H - 0.6;
+  const tunnelY1 = rackY + rack.tip + 1.2;
+  const rearPillarH = 4.8;
+  const frontPillarH = 4.8;
+  const keeperY0 = tunnelY0 - rearPillarH;
+  const keeperY1 = tunnelY1 + frontPillarH;
+  const pillarTop = KIT.hubT + PINION_T + 0.8;
+  const keeperSolids = [
+    slab({ outer: roundedRect({ x: -6, y: keeperY0 - rackY, w: 12, h: rearPillarH, r: 1.4, n: 3 }), z: 0, h: pillarTop }),
+    slab({ outer: roundedRect({ x: -6, y: tunnelY1 - rackY, w: 12, h: frontPillarH, r: 1.4, n: 3 }), z: 0, h: pillarTop }),
+    slab({ outer: roundedRect({ x: -6, y: keeperY0 - rackY, w: 12, h: keeperY1 - keeperY0, r: 1.8, n: 4 }), z: pillarTop, h: 3.6 }),
+  ];
+
+  // Rear guide wall supports the back of the rack along the stroke between the two end keepers
   const frame = part({
     id: 'frame',
     name: 'Base frame',
@@ -164,23 +177,13 @@ export function build(p) {
       }),
       // Rear guide wall that resists the 20° radial separating force
       slab({
-        outer: roundedRect({ x: -keeperX - 8, y: backGuideY, w: (keeperX + 8) * 2, h: 5.0, r: 1.8, n: 4 }),
+        outer: roundedRect({ x: -keeperX + 6.3, y: keeperY0, w: (keeperX - 6.3) * 2, h: rearPillarH, r: 1.4, n: 4 }),
         z: plateT,
         h: KIT.hubT + PINION_T,
       }),
       postSolid({ x: 0, y: pinionY, z0: plateT, h: g.pinionTop - plateT + 2, r: shaft.hasFramePost ? POST_R : shaft.postR }),
     ],
   });
-
-  // Compact bridge keepers at either end of the stroke
-  const keeperY0 = rackY - RACK_H - 5.4;
-  const keeperY1 = rackY + rack.tip + 3.8;
-  const pillarTop = KIT.hubT + PINION_T + 0.8;
-  const keeperSolids = [
-    slab({ outer: roundedRect({ x: -6, y: keeperY0 - rackY, w: 12, h: 4.8, r: 1.4, n: 3 }), z: 0, h: pillarTop }),
-    slab({ outer: roundedRect({ x: -6, y: keeperY1 - rackY - 4.4, w: 12, h: 4.4, r: 1.4, n: 3 }), z: 0, h: pillarTop }),
-    slab({ outer: roundedRect({ x: -6, y: keeperY0 - rackY, w: 12, h: keeperY1 - keeperY0, r: 1.8, n: 4 }), z: pillarTop, h: 3.6 }),
-  ];
 
   const keeperL = part({
     id: 'keeper',

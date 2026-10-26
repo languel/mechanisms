@@ -36,8 +36,9 @@
       <div class="filters" id="filters">{{chips}}</div>
       <div class="filters" role="group" aria-label="Grid drawing style">
         <span style="font:600 10.5px/1 var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-right:4px">View:</span>
-        <button class="chip" type="button" data-grid-style="patent" aria-pressed="true">Hatched Line</button>
-        <button class="chip" type="button" data-grid-style="color" aria-pressed="false">Sky &amp; Gold Color</button>
+        <button class="chip" type="button" data-grid-style="hatch" aria-pressed="true">Hatched</button>
+        <button class="chip" type="button" data-grid-style="line" aria-pressed="false">Line</button>
+        <button class="chip" type="button" data-grid-style="color" aria-pressed="false">Color</button>
       </div>
     </div>
   </div>
@@ -122,35 +123,35 @@
       <h3 style="font-size:18px;margin:0 0 4px">Key Motor Terms &amp; Formulas: RPM, Torque, Load &amp; Signals</h3>
       <div class="terms-grid">
         <div class="term-card">
-          <div class="term-head"><b>RPM &amp; Angular Velocity</b><code>\omega = \frac{2\pi \cdot \text{RPM}}{60}</code></div>
+          <div class="term-head"><b>RPM &amp; Angular Velocity</b><span class="math-badge">$\omega = \frac{2\pi \cdot \text{RPM}}{60}$</span></div>
           <p><b>Revolutions Per Minute</b> measures no-load shaft speed. Converted to angular velocity $\omega$ (rad/s) for physics equations. Mechanical power is $P = \tau \cdot \omega$.</p>
         </div>
         <div class="term-card">
-          <div class="term-head"><b>Torque ($\tau$) &amp; Stall Torque</b><code>\tau = F \times r \text{ [kg}\cdot\text{cm / N}\cdot\text{m]}</code></div>
+          <div class="term-head"><b>Torque ($\tau$) &amp; Stall Torque</b><span class="math-badge">$\tau = F \times r \text{ (N}\cdot\text{m)}$</span></div>
           <p>Rotational force. <b>Stall torque</b> is maximum torque output at 0 RPM; <b>rated torque</b> is safe continuous limit before thermal overheating. $1\text{ N}\cdot\text{m} \approx 10.2\text{ kg}\cdot\text{cm}$.</p>
         </div>
         <div class="term-card">
-          <div class="term-head"><b>Mechanical Load</b><code>\tau_{\text{load}} \text{ vs. Speed}</code></div>
+          <div class="term-head"><b>Mechanical Load</b><span class="math-badge">$\tau_{\text{load}} \text{ vs. Speed}$</span></div>
           <p>Opposing resistance torque on the output shaft. Increasing load slows the motor, lowering back-EMF so current rises to match the required torque.</p>
         </div>
         <div class="term-card">
-          <div class="term-head"><b>Back-EMF ($V_{\text{bemf}}$)</b><code>V_{\text{bemf}} = k_e \cdot \omega</code></div>
+          <div class="term-head"><b>Back-EMF ($V_{\text{bemf}}$)</b><span class="math-badge">$V_{\text{bemf}} = k_e \cdot \omega$</span></div>
           <p>Generator voltage induced by spinning coils in a magnetic field that opposes supply voltage. Net driving voltage across the coil is $V_{\text{net}} = V_{\text{avg}} - V_{\text{bemf}}$.</p>
         </div>
         <div class="term-card">
-          <div class="term-head"><b>Gear Ratio &amp; Efficiency</b><code>\tau_{\text{out}} = \eta \cdot G \cdot \tau_{\text{motor}}</code></div>
-          <p>A gearbox divides speed $\omega_{\text{out}} = \omega_m / G$ while multiplying torque by $\eta \cdot G$, where $\eta \approx 90\text{–}95\%$ per spur gear mesh.</p>
+          <div class="term-head"><b>Gear Ratio &amp; Efficiency</b><span class="math-badge">$\tau_{\text{out}} = \eta \cdot G \cdot \tau_{\text{motor}}$</span></div>
+          <p>A gearbox divides speed $\omega_{\text{out}} = \omega_m / G$ while multiplying torque by $\eta \cdot G$, where $\eta \approx 90\text{--}95\%$ per spur gear mesh.</p>
         </div>
         <div class="term-card">
-          <div class="term-head"><b>Current &amp; Thermal Limit</b><code>I = \frac{V - V_{\text{bemf}}}{R}, P = I^2 R</code></div>
+          <div class="term-head"><b>Current &amp; Thermal Limit</b><span class="math-badge">$I = \frac{V - V_{\text{bemf}}}{R}, P = I^2 R$</span></div>
           <p>At stall ($\omega = 0$), $V_{\text{bemf}} = 0$ so current jumps to stall current $I_{\text{stall}} = V/R_{\text{coil}}$, converting 100% of power into coil heat.</p>
         </div>
         <div class="term-card">
-          <div class="term-head"><b>Control: PWM vs. Pulse Width</b><code>\text{PWM \% vs. 1000–2000 }\mu\text{s}</code></div>
+          <div class="term-head"><b>Control: PWM vs. Pulse Width</b><span class="math-badge">$\text{PWM \% vs. } 1000\text{--}2000\,\mu\text{s}$</span></div>
           <p>DC &amp; gearmotors use high-frequency PWM duty cycle to vary average voltage/speed; hobby servos read absolute 50 Hz pulse duration to command shaft position.</p>
         </div>
         <div class="term-card">
-          <div class="term-head"><b>Encoder Resolution (CPR)</b><code>\text{CPR} = 4 \times \text{slots} \times G</code></div>
+          <div class="term-head"><b>Encoder Resolution (CPR)</b><span class="math-badge">$\text{CPR} = 4 \times \text{slots} \times G$</span></div>
           <p>Quadrature encoders count all rising and falling edges of channels A &amp; B ($4\times$ decoding), giving sub-degree precision per output turn.</p>
         </div>
       </div>
@@ -245,15 +246,20 @@
   for (const b of buttons) b.addEventListener('click', () => apply(b.dataset.filter));
 
   const styleBtns = [...document.querySelectorAll('[data-grid-style]')];
-  const thumbs = [...document.querySelectorAll('img.thumb[data-patent-src]')];
+  const thumbs = [...document.querySelectorAll('img.thumb')];
   function applyGridStyle(style) {
     for (const img of thumbs) {
-      img.src = style === 'color' ? img.dataset.colorSrc : img.dataset.patentSrc;
+      if (style === 'line') img.src = img.dataset.lineSrc || img.dataset.patentSrc || img.src;
+      else if (style === 'color') img.src = img.dataset.colorSrc || img.src;
+      else img.src = img.dataset.hatchSrc || img.dataset.patentSrc || img.src;
     }
     for (const b of styleBtns) {
       b.setAttribute('aria-pressed', String(b.dataset.gridStyle === style));
     }
+    localStorage.setItem('grid-style', style);
   }
+  const savedStyle = localStorage.getItem('grid-style') || 'hatch';
+  applyGridStyle(savedStyle);
   for (const b of styleBtns) b.addEventListener('click', () => applyGridStyle(b.dataset.gridStyle));
 
   // Dark mode toggle
@@ -271,19 +277,26 @@
   }
 
   // KaTeX auto-render
-  window.addEventListener('DOMContentLoaded', () => {
-    if (window.renderMathInElement) {
-      renderMathInElement(document.body, {
+  function renderAllMath() {
+    if (typeof window.renderMathInElement === 'function') {
+      window.renderMathInElement(document.body, {
         delimiters: [
           { left: '$$', right: '$$', display: true },
           { left: '$', right: '$', display: false },
           { left: '\\[', right: '\\]', display: true },
           { left: '\\(', right: '\\)', display: false }
         ],
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
         throwOnError: false
       });
     }
-  });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderAllMath);
+  } else {
+    renderAllMath();
+  }
+  window.addEventListener('load', renderAllMath);
 </script>
 </body>
 </html>

@@ -608,6 +608,7 @@ input[type="range"] { accent-color: var(--accent); width: 100%; }
 }
 [data-theme="dark"] .cardlink .thumb {
   background: linear-gradient(180deg, #22201d, #1a1816);
+  filter: invert(0.92) hue-rotate(180deg) brightness(0.95) contrast(1.08);
 }
 .cardlink .body { padding: 11px 14px 13px; display: grid; gap: 6px; align-content: start; }
 .cardlink h3 { margin: 0; font-size: 16.5px; }
@@ -756,19 +757,22 @@ footer.site .wrap { display: flex; gap: 18px; flex-wrap: wrap; justify-content: 
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 5px;
+  gap: 8px;
+  margin-bottom: 6px;
 }
 .term-head b {
   font-size: 13.5px;
   color: var(--ink);
   font-family: var(--serif);
 }
-.term-head code {
-  font: 600 10.5px/1 var(--mono);
+.term-head code, .math-badge {
+  font: 600 11.5px/1.2 var(--mono);
   background: var(--paper-deep);
-  padding: 2px 5px;
+  padding: 2px 6px;
   border-radius: 4px;
-  color: var(--accent);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
 }
 .term-card p {
   margin: 0;

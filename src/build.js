@@ -83,8 +83,10 @@ async function buildOne(slug) {
   }
 
   // The card image: rendered with Teardown hidden-line removal at the module's chosen angle.
-  // Default grid card (`${slug}.svg`) is Patent Line (fill: false); `${slug}-color.svg` is Sky & Gold fill.
+  // 3 rendering styles: Hatched line (`-hatch.svg`), Patent line (`-line.svg`), and Color (`-color.svg`).
   const svgPath = path.join(IMG_DIR, `${slug}.svg`);
+  const hatchSvgPath = path.join(IMG_DIR, `${slug}-hatch.svg`);
+  const lineSvgPath = path.join(IMG_DIR, `${slug}-line.svg`);
   const colorSvgPath = path.join(IMG_DIR, `${slug}-color.svg`);
   let svgText;
   if (process.argv.includes('--html-only')) {
@@ -94,7 +96,7 @@ async function buildOne(slug) {
     const shot = mod.meta.screenshot || {};
     const angle = shot.t ?? 0;
     const pose = mod.pose(values, angle);
-    const figPatent = isoFigure(out.parts, pose, {
+    const figHatch = isoFigure(out.parts, pose, {
       width: 900,
       maxHeight: 680,
       azimuth: shot.azimuth ?? -0.62,
@@ -105,8 +107,22 @@ async function buildOne(slug) {
       prominentLines: true,
       hardware: true,
     });
-    svgText = figPatent.svg;
+    svgText = figHatch.svg;
     await fs.writeFile(svgPath, svgText);
+    await fs.writeFile(hatchSvgPath, svgText);
+
+    const figLine = isoFigure(out.parts, pose, {
+      width: 900,
+      maxHeight: 680,
+      azimuth: shot.azimuth ?? -0.62,
+      elevation: shot.elevation ?? 0.82,
+      background: '#f7f2e7',
+      fill: false,
+      hatch: false,
+      prominentLines: true,
+      hardware: true,
+    });
+    await fs.writeFile(lineSvgPath, figLine.svg);
 
     const figColor = isoFigure(out.parts, pose, {
       width: 900,
@@ -185,7 +201,7 @@ function renderCard(m, indexLabel) {
           <span class="plate-no">${esc(indexLabel)}</span>
           <span class="plate-cat">${esc(m.category)}</span>
         </div>
-        <img class="thumb" src="assets/img/${m.slug}.svg" data-patent-src="assets/img/${m.slug}.svg" data-color-src="assets/img/${m.slug}-color.svg" alt="${esc(m.title)} — technical assembly drawing" loading="lazy" width="900" height="680">
+        <img class="thumb" src="assets/img/${m.slug}-hatch.svg" data-hatch-src="assets/img/${m.slug}-hatch.svg" data-line-src="assets/img/${m.slug}-line.svg" data-color-src="assets/img/${m.slug}-color.svg" data-patent-src="assets/img/${m.slug}-line.svg" alt="${esc(m.title)} — technical assembly drawing" loading="lazy" width="900" height="680">
         <div class="body">
           <h3>${esc(m.title)}</h3>
           <p class="desc">${esc(brief)}</p>
