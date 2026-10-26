@@ -229,6 +229,8 @@ export class Viewer {
   }
 
   clearTrace() {
+    this.traceLine = null;
+    this.traceCursor = null;
     while (this.traceGroup.children.length) {
       const child = this.traceGroup.children[0];
       this.traceGroup.remove(child);
@@ -251,21 +253,62 @@ export class Viewer {
       opacity: 0.95,
       depthTest: true,
     });
-    const line = new THREE.Line(geo, mat);
-    line.renderOrder = 999;
-    this.traceGroup.add(line);
+    this.traceLine = new THREE.Line(geo, mat);
+    this.traceLine.renderOrder = 999;
+    this.traceGroup.add(this.traceLine);
+
+    // Dynamic Kinematic Tracer beacon + physical stylus contact pin
+    const cursorGroup = new THREE.Group();
+    // Luminous beacon ring
+    const ringGeo = new THREE.RingGeometry(2.4, 3.6, 24);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: isDark ? 0xffb74d : 0xc2571f,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.9,
+    });
+    const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+    cursorGroup.add(ringMesh);
+
+    // Glowing core sphere
+    const dotGeo = new THREE.SphereGeometry(2.0, 16, 16);
+    const dotMat = new THREE.MeshStandardMaterial({
+      color: isDark ? 0xffca28 : 0xd84315,
+      emissive: isDark ? 0xff8f00 : 0xbf360c,
+      emissiveIntensity: 0.65,
+      roughness: 0.35,
+    });
+    const dot = new THREE.Mesh(dotGeo, dotMat);
+    cursorGroup.add(dot);
+
+    // Stylus pin dropping down to touch the part surface
+    const stylusGeo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, -3.8),
+    ]);
+    const stylusMat = new THREE.LineBasicMaterial({
+      color: isDark ? 0xffffff : 0x221f1b,
+      transparent: true,
+      opacity: 0.75,
+    });
+    cursorGroup.add(new THREE.Line(stylusGeo, stylusMat));
+
+    cursorGroup.renderOrder = 1000;
+    this.traceCursor = cursorGroup;
+    this.traceGroup.add(cursorGroup);
 
     if (currentPoint) {
-      const cx = currentPoint.x ?? currentPoint[0];
-      const cy = currentPoint.y ?? currentPoint[1];
-      const cz = (currentPoint.z ?? currentPoint[2] ?? 18) + (this.explode * 14);
-      const dotGeo = new THREE.SphereGeometry(2.4, 16, 16);
-      const dotMat = new THREE.MeshBasicMaterial({ color: isDark ? 0xffffff : 0x221f1b });
-      const dot = new THREE.Mesh(dotGeo, dotMat);
-      dot.position.set(cx, cy, cz);
-      dot.renderOrder = 1000;
-      this.traceGroup.add(dot);
+      this.updateTraceCursor(currentPoint);
     }
+  }
+
+  updateTraceCursor(currentPoint) {
+    if (!this.traceCursor || !currentPoint) return;
+    const cx = currentPoint.x ?? currentPoint[0];
+    const cy = currentPoint.y ?? currentPoint[1];
+    const cz = (currentPoint.z ?? currentPoint[2] ?? 18) + (this.explode * 14);
+    this.traceCursor.position.set(cx, cy, cz);
+    this.traceCursor.visible = true;
   }
 
   clearTrails() {

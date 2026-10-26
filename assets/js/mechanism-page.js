@@ -45,19 +45,29 @@ const el = (tag, props = {}, ...kids) => {
 
 /* --------------------------------------------------------------- dark mode */
 
+const MOON_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+const SUN_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+
 const savedTheme = (typeof localStorage !== 'undefined' ? localStorage.getItem('theme-mode') : null)
   || (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 if (savedTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 
 const themeModeBtn = $('#theme-mode-btn');
+function updateThemeToggle(isDark) {
+  if (themeModeBtn) {
+    themeModeBtn.innerHTML = isDark ? SUN_ICON : MOON_ICON;
+    themeModeBtn.setAttribute('title', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    themeModeBtn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+}
 if (themeModeBtn) {
-  themeModeBtn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+  updateThemeToggle(document.documentElement.getAttribute('data-theme') === 'dark');
   themeModeBtn.addEventListener('click', () => {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const next = isDark ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     if (typeof localStorage !== 'undefined') localStorage.setItem('theme-mode', next);
-    themeModeBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+    updateThemeToggle(next === 'dark');
     if (viewer) {
       viewer.setViewState({ isDark: next === 'dark' });
       applyPose();
@@ -82,6 +92,7 @@ const state = {
   ghost: false,
   hideBase: false,
   patent: false,
+  hatch: true,
   colorTheme: 'sky-gold',
   hardware: true,
   traceMotion: false,
@@ -195,6 +206,17 @@ function build() {
   if (state.viewMode !== '3d') renderStageOverlay();
 }
 
+function updateTraceBadge(tr) {
+  const badge = $('#trace-badge');
+  if (!badge) return;
+  if (!state.traceMotion || !tr) {
+    badge.classList.add('hidden');
+    return;
+  }
+  badge.innerHTML = `<span class="dot"></span><b>TRACER:</b> ${tr.label} <small>— ${tr.desc}</small>`;
+  badge.classList.remove('hidden');
+}
+
 function getKinematicTrace(m, vals, currentAngle) {
   if (typeof m.tracePoint === 'function') {
     const pts = [];
@@ -202,7 +224,7 @@ function getKinematicTrace(m, vals, currentAngle) {
       pts.push(m.tracePoint(vals, deg));
     }
     const cur = m.tracePoint(vals, currentAngle);
-    return { pts, cur };
+    return { pts, cur, label: 'Kinematic output point', desc: 'Continuous locus traced through one full cycle' };
   }
 
   const slug = m.meta?.slug;
@@ -223,7 +245,12 @@ function getKinematicTrace(m, vals, currentAngle) {
       y: (curP.coupler?.dy || 0) + (b / 2) * Math.sin(ca),
       z: 24.2,
     };
-    return { pts, cur };
+    return {
+      pts,
+      cur,
+      label: 'Coupler link midpoint',
+      desc: 'Floating link coupler curve between crank and oscillating rocker',
+    };
   }
 
   if (slug === 'crank-slider') {
@@ -239,12 +266,20 @@ function getKinematicTrace(m, vals, currentAngle) {
     }
     const curP = m.pose(vals, currentAngle);
     const th = currentAngle * (Math.PI / 180);
+    const kx = r * Math.cos(th);
+    const ky = r * Math.sin(th);
+    const sx = (curP.slider?.dx || 0) + (curP.slider?.x || 0);
     const cur = {
-      x: (r * Math.cos(th) + (curP.slider?.dx || 0)) / 2,
-      y: (r * Math.sin(th)) / 2,
+      x: (kx + sx) / 2,
+      y: ky / 2,
       z: 24.2,
     };
-    return { pts, cur };
+    return {
+      pts,
+      cur,
+      label: 'Connecting rod center',
+      desc: 'Elliptical motion bridging rotation to pure linear oscillation',
+    };
   }
 
   if (slug === 'scotch-yoke') {
@@ -256,7 +291,12 @@ function getKinematicTrace(m, vals, currentAngle) {
     }
     const th = currentAngle * (Math.PI / 180);
     const cur = { x: r * Math.cos(th), y: r * Math.sin(th), z: 22.0 };
-    return { pts, cur };
+    return {
+      pts,
+      cur,
+      label: 'Crank drive pin',
+      desc: 'Pure harmonic circular orbit directly converted into sinusoidal stroke',
+    };
   }
 
   if (slug === 'servo-crank') {
@@ -270,7 +310,96 @@ function getKinematicTrace(m, vals, currentAngle) {
     const curP = m.pose(vals, currentAngle);
     const a = curP.arm?.rot || 0;
     const cur = { x: r * Math.cos(a), y: r * Math.sin(a), z: 33.0 };
-    return { pts, cur };
+    return {
+      pts,
+      cur,
+      label: 'Servo horn drive pin',
+      desc: 'Angular stroke arc driving the pushrod output link',
+    };
+  }
+
+  if (slug === 'cam-follower') {
+    const pts = [];
+    for (let deg = 0; deg <= 360; deg += 4) {
+      const p = m.pose(vals, deg);
+      const dy = p.follower?.dy || 0;
+      pts.push({ x: 0, y: 35 + dy, z: 22.5 });
+    }
+    const curP = m.pose(vals, currentAngle);
+    const cur = { x: 0, y: 35 + (curP.follower?.dy || 0), z: 22.5 };
+    return {
+      pts,
+      cur,
+      label: 'Follower roller center',
+      desc: 'Linear reciprocating stroke following the cam harmonic profile',
+    };
+  }
+
+  if (slug === 'geneva-indexer') {
+    const pts = [];
+    for (let deg = 0; deg <= 360; deg += 4) {
+      const p = m.pose(vals, deg);
+      const a = p.driver?.rot || (deg * Math.PI / 180);
+      const r = vals.crankR || 28;
+      const dx = (p.driver?.dx || -35) + r * Math.cos(a);
+      const dy = (p.driver?.dy || 0) + r * Math.sin(a);
+      pts.push({ x: dx, y: dy, z: 24.5 });
+    }
+    const curP = m.pose(vals, currentAngle);
+    const a = curP.driver?.rot || (currentAngle * Math.PI / 180);
+    const r = vals.crankR || 28;
+    const cur = {
+      x: (curP.driver?.dx || -35) + r * Math.cos(a),
+      y: (curP.driver?.dy || 0) + r * Math.sin(a),
+      z: 24.5,
+    };
+    return {
+      pts,
+      cur,
+      label: 'Drive wheel pin',
+      desc: 'Continuous circular pin path entering, indexing and exiting the star slots',
+    };
+  }
+
+  if (slug === 'ratchet-pawl') {
+    const pts = [];
+    for (let deg = 0; deg <= 360; deg += 4) {
+      const p = m.pose(vals, deg);
+      const tipX = (p.drivePawl?.dx || 0) + 14 * Math.cos(p.drivePawl?.rot || 0);
+      const tipY = (p.drivePawl?.dy || 0) + 14 * Math.sin(p.drivePawl?.rot || 0);
+      pts.push({ x: tipX, y: tipY, z: 23.5 });
+    }
+    const curP = m.pose(vals, currentAngle);
+    const tipX = (curP.drivePawl?.dx || 0) + 14 * Math.cos(curP.drivePawl?.rot || 0);
+    const tipY = (curP.drivePawl?.dy || 0) + 14 * Math.sin(curP.drivePawl?.rot || 0);
+    const cur = { x: tipX, y: tipY, z: 23.5 };
+    return {
+      pts,
+      cur,
+      label: 'Drive pawl tip',
+      desc: 'Hooking stroke indexing the ratchet wheel tooth by tooth',
+    };
+  }
+
+  if (slug === 'gear-pair') {
+    const d1 = (vals.driver || 18) * (vals.module || 2);
+    const d2 = (vals.driven || 36) * (vals.module || 2);
+    const pitchR1 = d1 / 2;
+    const pitchR2 = d2 / 2;
+    const centre = pitchR1 + pitchR2;
+    const pitchPointX = -centre / 2 + pitchR1;
+    const pts = [];
+    for (let dy = -14; dy <= 14; dy += 2) {
+      pts.push({ x: pitchPointX, y: dy, z: 12.0 });
+    }
+    const th = currentAngle * (Math.PI / 180);
+    const cur = { x: pitchPointX, y: 6 * Math.sin(th * 3), z: 12.0 };
+    return {
+      pts,
+      cur,
+      label: 'Pitch line mesh contact',
+      desc: 'Line of action passing through the pitch point at 20° pressure angle',
+    };
   }
 
   return null;
@@ -281,7 +410,7 @@ function applyPose() {
   viewer.applyPose(currentPose);
   if (state.traceMotion) {
     const tr = getKinematicTrace(mod, values, state.t);
-    if (tr) viewer.setTrace(tr.pts, tr.cur);
+    if (tr && tr.cur) viewer.updateTraceCursor(tr.cur);
   }
   updateReadouts();
   if (state.viewMode === 'blueprint' && !state.playing) {
@@ -346,6 +475,7 @@ function renderStageOverlay() {
     const azDeg = (azRad / DEG) - 90;
     const elDeg = Math.max(-55, Math.min(55, (elRad / DEG) * 0.62));
     const isPatent = state.patent || state.colorTheme === 'patent';
+    const isHatch = !isPatent && (state.hatch || state.colorTheme === 'hatches');
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
     const fig = renderTeardownSvg(visibleParts, pose, {
@@ -355,13 +485,45 @@ function renderStageOverlay() {
       isolated: state.selected || null,
       hardware: state.hardware,
       preset: state.linework,
-      fill: !isPatent,
+      fill: isHatch ? 'hatch' : !isPatent,
+      hatch: isHatch,
       background: null,
       ink: isDark ? '#dcd6c8' : '#1e1c19',
     });
     const toolbar = el('div', { class: 'bp-bar' },
-      el('span', { class: 'bp-title' }, isPatent ? 'PATENT INK LINEWORK · PURE HLR WIREFRAME' : 'TEARDOWN HLR PROJECTION · ISO 128 LINEWORK'),
+      el('span', { class: 'bp-title' }, isHatch ? 'HATCHED TECHNICAL PROJECTION' : (isPatent ? 'PATENT INK LINEWORK · PURE HLR WIREFRAME' : 'TEARDOWN HLR PROJECTION · ISO 128 LINEWORK')),
       el('div', { class: 'bp-actions' },
+        el('button', {
+          type: 'button',
+          class: 'chip small-chip',
+          'aria-pressed': String(isHatch),
+          onclick: () => {
+            state.hatch = true;
+            state.patent = false;
+            renderStageOverlay();
+          },
+        }, 'Hatched'),
+        el('button', {
+          type: 'button',
+          class: 'chip small-chip',
+          'aria-pressed': String(isPatent),
+          onclick: () => {
+            state.patent = true;
+            state.hatch = false;
+            renderStageOverlay();
+          },
+        }, 'Patent line'),
+        el('button', {
+          type: 'button',
+          class: 'chip small-chip',
+          'aria-pressed': String(!isHatch && !isPatent),
+          onclick: () => {
+            state.hatch = false;
+            state.patent = false;
+            renderStageOverlay();
+          },
+        }, 'Color shaded'),
+        el('span', { style: 'border-left: 1px solid var(--line); margin: 0 4px; height: 16px;' }),
         ...['technical', 'fine', 'service'].map((lw) =>
           el('button', {
             type: 'button',
@@ -369,18 +531,6 @@ function renderStageOverlay() {
             'aria-pressed': String(state.linework === lw),
             onclick: () => { state.linework = lw; renderStageOverlay(); },
           }, lw)),
-        el('button', {
-          type: 'button',
-          class: 'chip small-chip',
-          'aria-pressed': String(state.patent),
-          onclick: () => {
-            state.patent = !state.patent;
-            const pb = $('#patent-btn');
-            if (pb) pb.setAttribute('aria-pressed', String(state.patent));
-            viewer.setViewState({ patent: state.patent });
-            renderStageOverlay();
-          },
-        }, 'Patent ink'),
         el('button', {
           type: 'button',
           class: 'chip small-chip',
@@ -399,6 +549,12 @@ function renderStageOverlay() {
           class: 'chip small-chip',
           onclick: () => downloadBlueprintSvg(),
         }, 'Download .svg'),
+        el('button', {
+          type: 'button',
+          class: 'chip small-chip',
+          style: 'color: var(--accent); font-weight: 600;',
+          onclick: () => setViewMode('3d'),
+        }, '✕ Return to 3D Stage'),
       ),
     );
     const wrap = el('div', { class: 'bp-svg-wrap', html: fig.svg });
@@ -1364,6 +1520,10 @@ function tick(now) {
   if (!moved) return;
 
   viewer.applyPose(mod.pose(values, state.t));
+  if (state.traceMotion) {
+    const tr = getKinematicTrace(mod, values, state.t);
+    if (tr && tr.cur) viewer.updateTraceCursor(tr.cur);
+  }
   readoutClock += dt;
   if (readoutClock > 0.08) { readoutClock = 0; updateReadouts(); }
 }
@@ -1404,6 +1564,12 @@ function wire() {
     themeSelect.value = state.colorTheme;
     themeSelect.addEventListener('change', (e) => {
       state.colorTheme = e.target.value;
+      if (state.colorTheme === 'hatches') {
+        state.hatch = true;
+        state.patent = false;
+        setViewMode('blueprint');
+        return;
+      }
       if (state.colorTheme === 'patent') {
         state.patent = true;
       } else if (state.patent && $('#patent-btn')?.getAttribute('aria-pressed') === 'true') {
@@ -1444,9 +1610,13 @@ function wire() {
       e.currentTarget.setAttribute('aria-pressed', String(state.traceMotion));
       if (state.traceMotion) {
         const tr = getKinematicTrace(mod, values, state.t);
-        if (tr) viewer.setTrace(tr.pts, tr.cur);
+        if (tr) {
+          viewer.setTrace(tr.pts, tr.cur);
+          updateTraceBadge(tr);
+        }
       } else {
         viewer.clearTrace();
+        updateTraceBadge(null);
       }
     });
   }

@@ -224,7 +224,11 @@ export function triangulate(outer, holes = []) {
  */
 export function extrude({ outer, holes = [], z = 0, h }) {
   if (!(h > 0)) throw new Error('extrude: height must be positive');
-  const cap = triangulate(outer, holes);
+  const snap = (v) => Math.round(v * 1e4) / 1e4;
+  const snapRing = (r) => cleanPolygon(r.map((p) => [snap(p[0]), snap(p[1])]));
+  const cleanOuter = snapRing(outer);
+  const cleanHoles = (holes || []).map(snapRing).filter((r) => r.length >= 3);
+  const cap = triangulate(cleanOuter, cleanHoles);
   if (!cap.length) return [];
 
   const tris = [];

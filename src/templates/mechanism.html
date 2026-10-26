@@ -27,7 +27,7 @@
       <a href="../../index.html#mechanisms">Mechanisms</a>
       <a href="../../index.html#motors">Motors</a>
       <a href="../../index.html#fabrication">Fabrication</a>
-      <button class="theme-mode-btn" id="theme-mode-btn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+      <button class="theme-mode-btn" id="theme-mode-btn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
     </nav>
   </div>
 </header>
@@ -46,11 +46,12 @@
       <div id="viewport">
         <div id="fallback" aria-hidden="true">{{fallback}}</div>
         <canvas id="stage-canvas"></canvas>
+        <div id="trace-badge" class="trace-badge hidden" aria-live="polite"></div>
         <div id="blueprint-view" class="blueprint-view hidden" aria-live="polite"></div>
         <div class="stage-tools">
           <div class="mode-group" role="group" aria-label="View mode">
             <button class="chip" id="mode-3d" type="button" aria-pressed="true" title="Interactive 3D CAD workbench (drag to orbit, scroll to zoom)">3D Stage</button>
-            <button class="chip" id="mode-blueprint" type="button" aria-pressed="false" title="Hidden-line-removed Teardown technical drawing">Teardown SVG</button>
+            <button class="chip" id="mode-blueprint" type="button" aria-pressed="false" title="Hatched technical projection drawing">Hatched SVG</button>
             <button class="chip" id="mode-bed" type="button" aria-pressed="false" title="220 × 220 mm 3D printer build plate layout">Print Bed</button>
           </div>
           <div class="cam-group" role="group" aria-label="Camera angle presets">
