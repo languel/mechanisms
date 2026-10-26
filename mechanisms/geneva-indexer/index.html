@@ -106,6 +106,7 @@
 </svg></div>
         <canvas id="stage-canvas"></canvas>
         <div id="trace-badge" class="trace-badge hidden" aria-live="polite"></div>
+        <div id="grid-legend" class="grid-legend"><span class="grid-bar"></span>Grid: 10 mm · 50 mm major</div>
         <div id="blueprint-view" class="blueprint-view hidden" aria-live="polite"></div>
         <div class="stage-tools">
           <div class="mode-group" role="group" aria-label="View mode">
@@ -129,6 +130,8 @@
               <option value="hatches">Theme: Different Hatches</option>
               <option value="spectrum">Theme: Spectrum (Muted)</option>
             </select>
+            <button class="chip" id="grid-btn" type="button" aria-pressed="true" title="Toggle dimensional 10 mm / 50 mm grid underlay">Grid</button>
+            <button class="chip" id="shadow-btn" type="button" aria-pressed="true" title="Toggle contact shadows">Shadows</button>
             <button class="chip" id="trace-btn" type="button" aria-pressed="false" title="Toggle continuous 3D motion path trace of coupler, slider or output point">Trace motion</button>
             <button class="chip" id="patent-btn" type="button" aria-pressed="false" title="Toggle 19th-century patent line-drawing shader">Patent line</button>
             <button class="chip" id="hide-base-btn" type="button" aria-pressed="false" title="Hide the baseplate to inspect floating mechanism parts">Hide base</button>

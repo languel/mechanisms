@@ -781,6 +781,45 @@ footer.site .wrap { display: flex; gap: 18px; flex-wrap: wrap; justify-content: 
   font-size: 11px;
 }
 
+/* Dimensional Grid Legend & Scale Readout */
+.grid-legend {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  z-index: 10;
+  font: 500 10.5px/1 var(--mono);
+  color: var(--muted);
+  background: color-mix(in srgb, var(--card) 90%, transparent);
+  border: 1px solid var(--line-soft);
+  padding: 4px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.grid-legend.hidden { display: none !important; }
+.grid-legend .grid-bar {
+  display: inline-block;
+  width: 24px;
+  height: 3px;
+  background: var(--muted);
+  position: relative;
+}
+.grid-legend .grid-bar::before,
+.grid-legend .grid-bar::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  width: 1px;
+  height: 7px;
+  background: var(--muted);
+}
+.grid-legend .grid-bar::before { left: 0; }
+.grid-legend .grid-bar::after { right: 0; }
+
 /* Hardware Spec Links */
 .hw-spec-link {
   display: inline-flex;

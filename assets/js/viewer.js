@@ -41,6 +41,8 @@ export class Viewer {
     this.ghost = false;
     this.hideBase = false;
     this.patent = false;
+    this.showGrid = true;
+    this.showShadow = true;
     this.colorTheme = 'sky-gold';
     this.showHardware = true;
     this.isDark = (typeof document !== 'undefined') && document.documentElement.getAttribute('data-theme') === 'dark';
@@ -60,6 +62,7 @@ export class Viewer {
 
     this.buildLights();
     this.buildTable();
+    this.buildGrid();
 
     this.parts = [];
     this.meshes = new Map();
@@ -125,12 +128,18 @@ export class Viewer {
       if (this.fillLight) { this.fillLight.color.setHex(0x8fa2b5); this.fillLight.intensity = 0.52; }
       if (this.underLight) { this.underLight.intensity = 0.45; }
       if (this.tablePlane) { this.tablePlane.material.opacity = 0.35; this.tablePlane.material.color.setHex(0x020202); }
+      if (this.gridMinorMat) { this.gridMinorMat.color.setHex(0x36322b); this.gridMinorMat.opacity = 0.45; }
+      if (this.gridMajorMat) { this.gridMajorMat.color.setHex(0x585044); this.gridMajorMat.opacity = 0.7; }
+      if (this.gridScaleMat) { this.gridScaleMat.color.setHex(0x827a6b); }
     } else {
       if (this.hemi) { this.hemi.color.setHex(0xfffcf5); this.hemi.groundColor.setHex(0xcbbfae); this.hemi.intensity = 1.18; }
       if (this.keyLight) { this.keyLight.color.setHex(0xfff6ea); this.keyLight.intensity = 1.48; }
       if (this.fillLight) { this.fillLight.color.setHex(0xdfe8ff); this.fillLight.intensity = 0.55; }
       if (this.underLight) { this.underLight.intensity = 0.62; }
       if (this.tablePlane) { this.tablePlane.material.opacity = 0.13; this.tablePlane.material.color.setHex(0x4a3b28); }
+      if (this.gridMinorMat) { this.gridMinorMat.color.setHex(0xd8d0bf); this.gridMinorMat.opacity = 0.6; }
+      if (this.gridMajorMat) { this.gridMajorMat.color.setHex(0xb5aa95); this.gridMajorMat.opacity = 0.85; }
+      if (this.gridScaleMat) { this.gridScaleMat.color.setHex(0x7a7162); }
     }
   }
 
@@ -141,9 +150,80 @@ export class Viewer {
     );
     plane.rotation.x = -Math.PI / 2;
     plane.position.y = -0.35;
-    plane.receiveShadow = true;
+    plane.receiveShadow = this.showShadow;
     this.tablePlane = plane;
     this.scene.add(plane);
+  }
+
+  buildGrid() {
+    this.gridGroup = new THREE.Group();
+    this.gridGroup.position.z = -0.15; // in mechanism frame, just below z=0
+
+    const minorPts = [];
+    const majorPts = [];
+    const size = 320; // 320 x 320 mm dimensional grid plane
+    const step = 10;  // 10 mm minor cell spacing
+
+    for (let x = -size / 2; x <= size / 2; x += step) {
+      const isMajor = Math.round(x) % 50 === 0;
+      const target = isMajor ? majorPts : minorPts;
+      target.push(new THREE.Vector3(x, -size / 2, 0));
+      target.push(new THREE.Vector3(x, size / 2, 0));
+    }
+    for (let y = -size / 2; y <= size / 2; y += step) {
+      const isMajor = Math.round(y) % 50 === 0;
+      const target = isMajor ? majorPts : minorPts;
+      target.push(new THREE.Vector3(-size / 2, y, 0));
+      target.push(new THREE.Vector3(size / 2, y, 0));
+    }
+
+    const minorGeo = new THREE.BufferGeometry().setFromPoints(minorPts);
+    const majorGeo = new THREE.BufferGeometry().setFromPoints(majorPts);
+
+    this.gridMinorMat = new THREE.LineBasicMaterial({
+      color: this.isDark ? 0x36322b : 0xd8d0bf,
+      transparent: true,
+      opacity: this.isDark ? 0.45 : 0.6,
+      depthWrite: false,
+    });
+    this.gridMajorMat = new THREE.LineBasicMaterial({
+      color: this.isDark ? 0x585044 : 0xb5aa95,
+      transparent: true,
+      opacity: this.isDark ? 0.7 : 0.85,
+      depthWrite: false,
+    });
+
+    const minorLines = new THREE.LineSegments(minorGeo, this.gridMinorMat);
+    const majorLines = new THREE.LineSegments(majorGeo, this.gridMajorMat);
+    minorLines.renderOrder = -1;
+    majorLines.renderOrder = -1;
+
+    this.gridGroup.add(minorLines);
+    this.gridGroup.add(majorLines);
+
+    // 50 mm dimensional scale rule indicator at corner (-140 to -90 mm)
+    const scalePts = [
+      new THREE.Vector3(-140, -145, 0), new THREE.Vector3(-90, -145, 0),
+      new THREE.Vector3(-140, -148, 0), new THREE.Vector3(-140, -142, 0),
+      new THREE.Vector3(-90, -148, 0), new THREE.Vector3(-90, -142, 0),
+      new THREE.Vector3(-130, -146.5, 0), new THREE.Vector3(-130, -143.5, 0),
+      new THREE.Vector3(-120, -146.5, 0), new THREE.Vector3(-120, -143.5, 0),
+      new THREE.Vector3(-110, -146.5, 0), new THREE.Vector3(-110, -143.5, 0),
+      new THREE.Vector3(-100, -146.5, 0), new THREE.Vector3(-100, -143.5, 0),
+    ];
+    const scaleGeo = new THREE.BufferGeometry().setFromPoints(scalePts);
+    this.gridScaleMat = new THREE.LineBasicMaterial({
+      color: this.isDark ? 0x827a6b : 0x7a7162,
+      transparent: true,
+      opacity: 0.85,
+      depthWrite: false,
+    });
+    const scaleLines = new THREE.LineSegments(scaleGeo, this.gridScaleMat);
+    scaleLines.renderOrder = 0;
+    this.gridGroup.add(scaleLines);
+
+    this.gridGroup.visible = this.showGrid;
+    this.root.add(this.gridGroup);
   }
 
   /* ------------------------------------------------------------- geometry */
@@ -174,8 +254,8 @@ export class Viewer {
         polygonOffsetUnits: 1,
       });
       const mesh = new THREE.Mesh(geo, material);
-      mesh.castShadow = !isFrame;
-      mesh.receiveShadow = true;
+      mesh.castShadow = this.showShadow && !isFrame;
+      mesh.receiveShadow = this.showShadow;
       mesh.userData.partId = part.id;
       mesh.renderOrder = part.zOrder ?? (isFrame ? 0 : 1);
       mesh.position.set(part.at.x, part.at.y, part.at.z);
@@ -407,10 +487,25 @@ export class Viewer {
     }
   }
 
-  setViewState({ explode, ghost, hideBase, patent, colorTheme, showHardware, selected, hovered, isDark }) {
+  setViewState({ explode, ghost, hideBase, patent, colorTheme, showHardware, showGrid, showShadow, selected, hovered, isDark }) {
     if (typeof isDark === 'boolean') {
       this.isDark = isDark;
       this.updateLights();
+    }
+    if (typeof showGrid === 'boolean') {
+      this.showGrid = showGrid;
+      if (this.gridGroup) this.gridGroup.visible = showGrid;
+    }
+    if (typeof showShadow === 'boolean') {
+      this.showShadow = showShadow;
+      if (this.keyLight) this.keyLight.castShadow = showShadow;
+      if (this.tablePlane) this.tablePlane.visible = showShadow;
+      for (const { mesh, part } of this.meshes.values()) {
+        const isFrame = part.role === 'frame' || part.id === 'frame';
+        mesh.castShadow = showShadow && !isFrame;
+        mesh.receiveShadow = showShadow;
+        if (mesh.material) mesh.material.needsUpdate = true;
+      }
     }
     if (typeof explode === 'number') this.explode = explode;
     if (typeof ghost === 'boolean') this.ghost = ghost;

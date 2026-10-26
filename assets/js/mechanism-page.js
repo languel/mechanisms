@@ -93,6 +93,8 @@ const state = {
   hideBase: false,
   patent: false,
   hatch: true,
+  showGrid: true,
+  showShadow: true,
   colorTheme: 'sky-gold',
   hardware: true,
   traceMotion: false,
@@ -1621,6 +1623,28 @@ function wire() {
     });
   }
 
+  const gridBtn = $('#grid-btn');
+  const gridLegend = $('#grid-legend');
+  if (gridBtn) {
+    gridBtn.addEventListener('click', (e) => {
+      state.showGrid = !state.showGrid;
+      e.currentTarget.setAttribute('aria-pressed', String(state.showGrid));
+      viewer.setViewState({ showGrid: state.showGrid });
+      if (gridLegend) gridLegend.classList.toggle('hidden', !state.showGrid);
+      viewer.renderOnce();
+    });
+  }
+
+  const shadowBtn = $('#shadow-btn');
+  if (shadowBtn) {
+    shadowBtn.addEventListener('click', (e) => {
+      state.showShadow = !state.showShadow;
+      e.currentTarget.setAttribute('aria-pressed', String(state.showShadow));
+      viewer.setViewState({ showShadow: state.showShadow });
+      viewer.renderOnce();
+    });
+  }
+
   $('#ghost').addEventListener('click', (e) => {
     state.ghost = !state.ghost;
     e.currentTarget.setAttribute('aria-pressed', String(state.ghost));
@@ -1644,16 +1668,21 @@ function wire() {
     state.ghost = false;
     state.hardware = true;
     state.traceMotion = false;
+    state.showGrid = true;
+    state.showShadow = true;
     if (patentBtn) patentBtn.setAttribute('aria-pressed', 'false');
     if (hideBaseBtn) hideBaseBtn.setAttribute('aria-pressed', 'false');
     if (traceBtn) traceBtn.setAttribute('aria-pressed', 'false');
+    if (gridBtn) gridBtn.setAttribute('aria-pressed', 'true');
+    if (shadowBtn) shadowBtn.setAttribute('aria-pressed', 'true');
+    if (gridLegend) gridLegend.classList.remove('hidden');
     $('#ghost')?.setAttribute('aria-pressed', 'false');
     $('#hardware')?.setAttribute('aria-pressed', 'true');
     const mb = $('#motor-badge');
     if (mb && mod.meta.motorMount) mb.hidden = false;
     setStep(-1);
     setExplode(0);
-    viewer.setViewState({ patent: false, hideBase: false, ghost: false, showHardware: true });
+    viewer.setViewState({ patent: false, hideBase: false, ghost: false, showHardware: true, showGrid: true, showShadow: true });
     viewer.setCameraPreset?.('iso');
     renderParts();
     syncPlayButton();
