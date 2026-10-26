@@ -8,12 +8,522 @@
   },
   "mechanisms": [
     {
+      "slug": "gear-pair",
+      "title": "Spur gears",
+      "category": "Rotary → rotary",
+      "kind": "mechanism",
+      "tagline": "A ratio you can count: the teeth do the arithmetic, in whole numbers.",
+      "question": "Two gears mesh. What exactly decides how much slower the second one turns, and why do their teeth have that curve?",
+      "bigIdea": "Teeth are a counting device. The ratio is the tooth counts, the centre distance is set by the module, and the involute curve keeps the angular velocity ratio constant while one tooth hands over to the next.",
+      "params": [
+        {
+          "key": "driver",
+          "label": "Driver teeth (z₁)",
+          "unit": "",
+          "min": 12,
+          "max": 32,
+          "value": 18
+        },
+        {
+          "key": "driven",
+          "label": "Driven teeth (z₂)",
+          "unit": "",
+          "min": 16,
+          "max": 44,
+          "value": 36
+        },
+        {
+          "key": "module",
+          "label": "Module (m)",
+          "unit": "mm",
+          "min": 1.5,
+          "max": 2.5,
+          "value": 2
+        },
+        {
+          "key": "shaft",
+          "label": "Driver motor shaft",
+          "unit": "",
+          "min": null,
+          "max": null,
+          "value": "post"
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 4,
+      "instances": 5,
+      "grams": 127.9,
+      "triangles": 19692,
+      "hardware": 0,
+      "bed": [
+        166,
+        110
+      ],
+      "order": 10
+    },
+    {
+      "slug": "belt-pulley",
+      "title": "Belt and pulley drive",
+      "category": "Rotary → rotary",
+      "kind": "mechanism",
+      "tagline": "Span a distance without an intermediate gear train: a taut loop carries surface speed from one drum to another in the same direction.",
+      "question": "How do you transmit rotation across a long span without a chain of idler gears — and what decides how much torque a belt can carry before it slips?",
+      "bigIdea": "Every point on an inextensible belt travels at the same linear speed v = ω₁·r₁ = ω₂·r₂. That locks the speed ratio to the pulley diameters while preserving rotation direction, and the Euler–Eytelwein capstan equation T₁/T₂ = e^(μ·θ) makes friction grow exponentially with the wrap angle θ.",
+      "params": [
+        {
+          "key": "d1",
+          "label": "Driver pulley Ø (d₁)",
+          "unit": "mm",
+          "min": 22,
+          "max": 44,
+          "value": 28
+        },
+        {
+          "key": "d2",
+          "label": "Driven pulley Ø (d₂)",
+          "unit": "mm",
+          "min": 28,
+          "max": 68,
+          "value": 52
+        },
+        {
+          "key": "span",
+          "label": "Centre distance (C)",
+          "unit": "mm",
+          "min": 58,
+          "max": 96,
+          "value": 76
+        },
+        {
+          "key": "shaft",
+          "label": "Driver motor shaft",
+          "unit": "",
+          "min": null,
+          "max": null,
+          "value": "post"
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 6,
+      "instances": 7,
+      "grams": 98,
+      "triangles": 7304,
+      "hardware": 0,
+      "bed": [
+        152,
+        93.7491
+      ],
+      "order": 15
+    },
+    {
+      "slug": "rack-pinion",
+      "title": "Rack and pinion",
+      "category": "Rotary ↔ linear",
+      "kind": "mechanism",
+      "tagline": "A gear unrolled into a straight line: every radian of the pinion is one pitch radius of travel.",
+      "question": "How does a gear drive something in a straight line at constant speed, and what has to match for a round gear and a flat bar to mesh smoothly?",
+      "bigIdea": "The rack is a gear of infinite radius. Because its pitch circle is flat, its involute flanks become straight lines inclined at the 20° pressure angle, and one full turn of the pinion translates the rack by exact circumference π × d.",
+      "params": [
+        {
+          "key": "module",
+          "label": "Module (m)",
+          "unit": "mm",
+          "min": 1.5,
+          "max": 3,
+          "value": 2
+        },
+        {
+          "key": "teeth",
+          "label": "Pinion teeth (z)",
+          "unit": "",
+          "min": 12,
+          "max": 26,
+          "value": 18
+        },
+        {
+          "key": "stroke",
+          "label": "Rack stroke",
+          "unit": "mm",
+          "min": 24,
+          "max": 80,
+          "value": 56
+        },
+        {
+          "key": "shaft",
+          "label": "Pinion motor shaft",
+          "unit": "",
+          "min": null,
+          "max": null,
+          "value": "post"
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 5,
+      "instances": 6,
+      "grams": 119.3,
+      "triangles": 8116,
+      "hardware": 0,
+      "bed": [
+        168,
+        108
+      ],
+      "order": 20
+    },
+    {
+      "slug": "crank-slider",
+      "title": "Crank and slider",
+      "category": "Rotary → linear",
+      "kind": "mechanism",
+      "tagline": "One part turns continuously; the other can only slide. Every piston engine, pump and compressor is built on the link between them.",
+      "question": "If the crank turns at a constant speed, why does the slider race through the middle of its stroke, stop dead at each end, and move asymmetrically between the two halves?",
+      "bigIdea": "The slider only sees the horizontal projection of the crank pin’s circle plus the cosine foreshortening of the tilted connecting rod — so its stroke is exactly 2r, while the rod-to-crank ratio L/r controls how much sideways thrust the guide rails must absorb.",
+      "params": [
+        {
+          "key": "stroke",
+          "label": "Stroke",
+          "unit": "mm",
+          "min": 18,
+          "max": 60,
+          "value": 34
+        },
+        {
+          "key": "rod",
+          "label": "Rod length",
+          "unit": "mm",
+          "min": 44,
+          "max": 116,
+          "value": 80
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 5,
+      "instances": 7,
+      "grams": 128,
+      "triangles": 6256,
+      "hardware": 0,
+      "bed": [
+        176.5,
+        96
+      ],
+      "order": 30
+    },
+    {
+      "slug": "scotch-yoke",
+      "title": "Scotch yoke",
+      "category": "Rotary ↔ linear",
+      "kind": "mechanism",
+      "tagline": "A crank pin in a transverse slot: the geometric definition of a sine wave turned into solid hardware.",
+      "question": "How do you generate pure simple harmonic motion x(θ) = r·cos(θ) without the connecting-rod asymmetry of a crank and slider?",
+      "bigIdea": "Replace the swinging connecting rod with a vertical slot fixed at 90° to the slide axis. As the crank pin circles at radius r, its vertical component slides freely up and down the slot while its horizontal projection r·cos(θ) drives the yoke directly.",
+      "params": [
+        {
+          "key": "stroke",
+          "label": "Stroke (2r)",
+          "unit": "mm",
+          "min": 20,
+          "max": 48,
+          "value": 32
+        },
+        {
+          "key": "shaft",
+          "label": "Crank motor shaft",
+          "unit": "",
+          "min": null,
+          "max": null,
+          "value": "post"
+        },
+        {
+          "key": "clearance",
+          "label": "Slot & rail clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 5,
+      "instances": 5,
+      "grams": 133.8,
+      "triangles": 3984,
+      "hardware": 0,
+      "bed": [
+        172.4,
+        100.8
+      ],
+      "order": 32
+    },
+    {
+      "slug": "four-bar",
+      "title": "Four-bar linkage",
+      "category": "Rotary → rotary",
+      "kind": "mechanism",
+      "tagline": "Four bars and four pin joints: the simplest closed-loop linkage that turns full rotation into a tailored sweeping arc.",
+      "question": "What decides whether the input crank can spin a full 360° or jams partway around — and why does the output rocker sweep faster in one direction than the other?",
+      "bigIdea": "Grashof’s law (s + l ≤ p + q) is the pass/fail rule of linkages: as long as the shortest link plus the longest link does not exceed the sum of the other two, the shortest link can revolve continuously while driving the output rocker between two collinear toggle positions.",
+      "params": [
+        {
+          "key": "crank",
+          "label": "Crank length (a)",
+          "unit": "mm",
+          "min": 14,
+          "max": 26,
+          "value": 18
+        },
+        {
+          "key": "coupler",
+          "label": "Coupler length (b)",
+          "unit": "mm",
+          "min": 52,
+          "max": 82,
+          "value": 66
+        },
+        {
+          "key": "rocker",
+          "label": "Rocker length (c)",
+          "unit": "mm",
+          "min": 36,
+          "max": 62,
+          "value": 46
+        },
+        {
+          "key": "ground",
+          "label": "Ground span (d)",
+          "unit": "mm",
+          "min": 56,
+          "max": 84,
+          "value": 68
+        },
+        {
+          "key": "shaft",
+          "label": "Crank motor shaft",
+          "unit": "",
+          "min": null,
+          "max": null,
+          "value": "post"
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 5,
+      "instances": 8,
+      "grams": 143.6,
+      "triangles": 5144,
+      "hardware": 0,
+      "bed": [
+        178,
+        140
+      ],
+      "order": 35
+    },
+    {
+      "slug": "cam-follower",
+      "title": "Cam and roller follower",
+      "category": "Rotary → timed lift",
+      "kind": "mechanism",
+      "tagline": "A cam is a motion law you can hold: its outline is the timing diagram wrapped around a shaft.",
+      "question": "How can one steady rotation make a follower rise smoothly, dwell dead-still at the top, and return without a jolt — and what sets the limit on how steep that climb can be?",
+      "bigIdea": "You do not draw a cam’s shape directly; you specify its timing law s(θ). Wrapping that law around a base circle gives the pitch curve, and pulling it inward by the follower radius gives the physical cam.",
+      "params": [
+        {
+          "key": "lift",
+          "label": "Lift (h)",
+          "unit": "mm",
+          "min": 4,
+          "max": 14,
+          "value": 8
+        },
+        {
+          "key": "rise",
+          "label": "Rise angle (β₁)",
+          "unit": "°",
+          "min": 60,
+          "max": 200,
+          "value": 120
+        },
+        {
+          "key": "top",
+          "label": "Top dwell (β₂)",
+          "unit": "°",
+          "min": 0,
+          "max": 140,
+          "value": 60
+        },
+        {
+          "key": "roller",
+          "label": "Follower nose Ø",
+          "unit": "mm",
+          "min": 6,
+          "max": 16,
+          "value": 10
+        },
+        {
+          "key": "law",
+          "label": "Motion law",
+          "unit": "",
+          "min": null,
+          "max": null,
+          "value": "cycloidal"
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 5,
+      "instances": 6,
+      "grams": 141.7,
+      "triangles": 10200,
+      "hardware": 0,
+      "bed": [
+        148,
+        168
+      ],
+      "order": 40
+    },
+    {
+      "slug": "ratchet-pawl",
+      "title": "Ratchet and pawl",
+      "category": "Intermittent feed",
+      "kind": "mechanism",
+      "tagline": "A lever that swings both ways, driving a wheel that only turns one way in discrete steps.",
+      "question": "How does a back-and-forth oscillation become a series of equal steps in one direction — and what stops the wheel from backing up while the lever returns?",
+      "bigIdea": "Each asymmetric tooth is a mechanical diode: a steep radial face to push against and a gentle back slope to climb over. One pawl drives on the forward stroke; a stationary detent pawl holds the load on the return.",
+      "params": [
+        {
+          "key": "teeth",
+          "label": "Teeth",
+          "unit": "",
+          "min": 8,
+          "max": 20,
+          "value": 12
+        },
+        {
+          "key": "wheel",
+          "label": "Wheel diameter",
+          "unit": "mm",
+          "min": 48,
+          "max": 76,
+          "value": 62
+        },
+        {
+          "key": "swing",
+          "label": "Lever swing",
+          "unit": "°",
+          "min": 24,
+          "max": 64,
+          "value": 36
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 7,
+      "instances": 8,
+      "grams": 110.4,
+      "triangles": 5684,
+      "hardware": 0,
+      "bed": [
+        148,
+        110
+      ],
+      "order": 50
+    },
+    {
+      "slug": "geneva-indexer",
+      "title": "Geneva indexer",
+      "category": "Intermittent index",
+      "kind": "mechanism",
+      "tagline": "One steady turn in, discrete locked stops out — the mechanism behind film projectors and rotary indexing tables.",
+      "question": "How can a continuously turning shaft make an output wheel alternate between exact angular steps and dead-locked rest periods?",
+      "bigIdea": "The driver combines a full-diameter lower pin-carrier disc with a co-planar drive pin and crescent locking boss. During indexing, the pin sweeps a radial slot while the crescent clearance lets the wheel horns pass; during dwell, the circular boss locks the wheel concave arc.",
+      "params": [
+        {
+          "key": "slots",
+          "label": "Slots",
+          "unit": "",
+          "min": 3,
+          "max": 8,
+          "value": 4
+        },
+        {
+          "key": "wheel",
+          "label": "Wheel diameter",
+          "unit": "mm",
+          "min": 48,
+          "max": 88,
+          "value": 64
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 4,
+      "instances": 5,
+      "grams": 136.6,
+      "triangles": 5428,
+      "hardware": 0,
+      "bed": [
+        147.5588,
+        108.608
+      ],
+      "order": 60
+    },
+    {
       "slug": "servo-crank",
       "title": "Servo crank",
       "category": "Physical computing",
-      "tagline": "A servo holds an angle, not a speed. Half a crank circle is all it can give you — and that decides the whole motion.",
-      "question": "A servo sweeps 0–180°, but a crank needs a full turn. What does a servo-driven crank actually give you, and how do you choose the arm length?",
-      "bigIdea": "A servo crank is half a crank: the slider goes from the middle of its stroke to the end and back, so pick the arm radius for the stroke and the rod for the smoothness you can afford.",
+      "kind": "mechanism",
+      "tagline": "A servo holds a commanded angle, not a continuous speed — turning its 180° arc into linear position control.",
+      "question": "A standard hobby servo sweeps 0–180° instead of spinning continuously. How do you size the horn arm and connecting rod to get smooth, predictable linear stroke?",
+      "bigIdea": "Mount the linkage so the servo’s 90° midpoint stands perpendicular to the slider axis (or sweeps symmetrically across it): the three mounting holes on the printed horn trade stroke length against push force.",
       "params": [
         {
           "key": "arm",
@@ -50,218 +560,47 @@
       ],
       "printedParts": 5,
       "instances": 6,
-      "grams": 113.1,
-      "triangles": 4292,
+      "grams": 88.6,
+      "triangles": 4748,
       "hardware": 4,
       "bed": [
-        189,
-        92
+        155,
+        82
       ],
-      "order": 10
+      "order": 70
     },
     {
-      "slug": "cam-follower",
-      "title": "Cam and roller follower",
-      "category": "Rotary → timed lift",
-      "tagline": "A cam is a motion law you can hold: its shape is the timing diagram, wrapped around a shaft.",
-      "question": "How can one steady rotation make a follower rise smoothly, dwell at the top, and come back down without a jolt — and what limits how fast it can do it?",
-      "bigIdea": "You do not design a cam’s outline; you design its timing. The outline is just that timing wound round a shaft, pulled in by the roller radius.",
+      "slug": "dc-motor",
+      "title": "Brushed DC motor",
+      "category": "Motors & actuators",
+      "kind": "motor",
+      "tagline": "Continuous rotation from a split copper ring that flips coil current every half turn — controlled in speed by PWM and in direction by an H-bridge.",
+      "question": "If a coil in a magnetic field only wants to align with the magnets and stop, how does a DC motor keep spinning continuously — and why can’t an Arduino pin drive it directly?",
+      "bigIdea": "Just as an armature pole reaches the magnet it is attracted to, the split-ring commutator slides across the carbon brushes and reverses the current in that coil — turning attraction into repulsion at the exact right angle, automatically, at any speed.",
       "params": [
         {
-          "key": "lift",
-          "label": "Lift",
-          "unit": "mm",
-          "min": 4,
-          "max": 14,
-          "value": 8
+          "key": "duty",
+          "label": "PWM duty cycle",
+          "unit": "%",
+          "min": 10,
+          "max": 100,
+          "value": 75
         },
         {
-          "key": "rise",
-          "label": "Rise angle",
-          "unit": "°",
-          "min": 60,
-          "max": 200,
-          "value": 120
-        },
-        {
-          "key": "top",
-          "label": "Top dwell",
-          "unit": "°",
+          "key": "load",
+          "label": "Mechanical load",
+          "unit": "%",
           "min": 0,
-          "max": 140,
-          "value": 60
-        },
-        {
-          "key": "roller",
-          "label": "Shoe diameter",
-          "unit": "mm",
-          "min": 6,
-          "max": 16,
-          "value": 10
-        },
-        {
-          "key": "law",
-          "label": "Motion law",
-          "unit": "",
-          "min": null,
-          "max": null,
-          "value": "cycloidal"
-        },
-        {
-          "key": "clearance",
-          "label": "Bore clearance",
-          "unit": "mm",
-          "min": 0.2,
-          "max": 0.5,
-          "value": 0.3
-        }
-      ],
-      "printedParts": 5,
-      "instances": 6,
-      "grams": 172.1,
-      "triangles": 16176,
-      "hardware": 0,
-      "bed": [
-        168,
-        176
-      ],
-      "order": 20
-    },
-    {
-      "slug": "rack-pinion",
-      "title": "Rack and pinion",
-      "category": "Rotary ↔ linear",
-      "tagline": "A gear unrolled into a straight line: every radian of the pinion is one pitch radius of travel.",
-      "question": "How does a gear drive something in a straight line, and what has to match for the teeth to run smoothly into each other?",
-      "bigIdea": "The rack is the pinion’s pitch circle unrolled. Match the module and the tooth spacing lines up; the travel per turn is fixed by the pitch radius, not by the teeth you can see.",
-      "params": [
-        {
-          "key": "module",
-          "label": "Module",
-          "unit": "mm",
-          "min": 1.5,
-          "max": 3,
-          "value": 2
-        },
-        {
-          "key": "teeth",
-          "label": "Pinion teeth",
-          "unit": "",
-          "min": 12,
-          "max": 26,
-          "value": 18
-        },
-        {
-          "key": "stroke",
-          "label": "Rack stroke",
-          "unit": "mm",
-          "min": 24,
           "max": 80,
-          "value": 56
+          "value": 20
         },
         {
-          "key": "clearance",
-          "label": "Bore clearance",
-          "unit": "mm",
-          "min": 0.2,
-          "max": 0.5,
-          "value": 0.3
-        }
-      ],
-      "printedParts": 5,
-      "instances": 6,
-      "grams": 210.4,
-      "triangles": 8448,
-      "hardware": 0,
-      "bed": [
-        220,
-        168
-      ],
-      "order": 30
-    },
-    {
-      "slug": "gear-pair",
-      "title": "Spur gears",
-      "category": "Rotary → rotary",
-      "tagline": "A ratio you can count: the teeth do the arithmetic, in whole numbers.",
-      "question": "Two gears mesh. What exactly decides how much slower the second one turns, and why do their teeth have that curve?",
-      "bigIdea": "Teeth are a counting device. The ratio is the tooth counts, the centre distance is the module, and the involute curve is what keeps the speed steady while one tooth hands over to the next.",
-      "params": [
-        {
-          "key": "driver",
-          "label": "Driver teeth",
+          "key": "poles",
+          "label": "Armature poles",
           "unit": "",
-          "min": 12,
-          "max": 32,
-          "value": 18
-        },
-        {
-          "key": "driven",
-          "label": "Driven teeth",
-          "unit": "",
-          "min": 16,
-          "max": 44,
-          "value": 36
-        },
-        {
-          "key": "module",
-          "label": "Module",
-          "unit": "mm",
-          "min": 1.5,
-          "max": 2.5,
-          "value": 2
-        },
-        {
-          "key": "clearance",
-          "label": "Bore clearance",
-          "unit": "mm",
-          "min": 0.2,
-          "max": 0.5,
-          "value": 0.3
-        }
-      ],
-      "printedParts": 4,
-      "instances": 5,
-      "grams": 148,
-      "triangles": 19136,
-      "hardware": 0,
-      "bed": [
-        168,
-        132
-      ],
-      "order": 40
-    },
-    {
-      "slug": "ratchet-pawl",
-      "title": "Ratchet and pawl",
-      "category": "Intermittent feed",
-      "tagline": "A lever that swings both ways, driving a wheel that only turns one way.",
-      "question": "How does a back-and-forth motion become a series of equal steps in one direction — and what stops the wheel running backwards between steps?",
-      "bigIdea": "Each tooth is a one-way door: a steep face to push against and a long slope for the pawl to climb. One pawl drives, a second one holds, and the wheel advances one tooth per stroke.",
-      "params": [
-        {
-          "key": "teeth",
-          "label": "Teeth",
-          "unit": "",
-          "min": 8,
-          "max": 20,
-          "value": 12
-        },
-        {
-          "key": "wheel",
-          "label": "Wheel diameter",
-          "unit": "mm",
-          "min": 48,
-          "max": 76,
-          "value": 62
-        },
-        {
-          "key": "swing",
-          "label": "Lever swing",
-          "unit": "°",
-          "min": 24,
-          "max": 64,
-          "value": 36
+          "min": 3,
+          "max": 5,
+          "value": 3
         },
         {
           "key": "clearance",
@@ -273,101 +612,172 @@
         }
       ],
       "printedParts": 7,
-      "instances": 9,
-      "grams": 125.9,
-      "triangles": 5812,
-      "hardware": 0,
-      "bed": [
-        180,
-        106
-      ],
-      "order": 50
-    },
-    {
-      "slug": "geneva-indexer",
-      "title": "Geneva indexer",
-      "category": "Intermittent index",
-      "tagline": "One steady turn in, four dead stops out — the mechanism behind film projectors and assembly tables.",
-      "question": "How can one continuous rotation produce motion that stops dead for most of the cycle, and what sets how hard the wheel has to accelerate to get through a step?",
-      "bigIdea": "The driver does two jobs with two features: the pin moves the wheel, and the round boss locks it. The locking arc is why the output is truly stopped, not just slow.",
-      "params": [
-        {
-          "key": "slots",
-          "label": "Slots",
-          "unit": "",
-          "min": 3,
-          "max": 8,
-          "value": 4
-        },
-        {
-          "key": "wheel",
-          "label": "Wheel diameter",
-          "unit": "mm",
-          "min": 48,
-          "max": 88,
-          "value": 64
-        },
-        {
-          "key": "clearance",
-          "label": "Bore clearance",
-          "unit": "mm",
-          "min": 0.2,
-          "max": 0.5,
-          "value": 0.3
-        }
-      ],
-      "printedParts": 4,
-      "instances": 5,
-      "grams": 108.3,
-      "triangles": 5104,
-      "hardware": 0,
-      "bed": [
-        148.6697,
-        104
-      ],
-      "order": 60
-    },
-    {
-      "slug": "crank-slider",
-      "title": "Crank and slider",
-      "category": "Rotary → linear",
-      "tagline": "One part turns, the other can only slide. Everything about an engine follows from the link between them.",
-      "question": "If the crank turns at a constant speed, why does the slider race through the middle of its stroke and stop dead at each end?",
-      "bigIdea": "The slider only sees the part of the crank pin’s circle that points along the rails, so its speed rises and falls twice per turn while the crank never changes pace.",
-      "params": [
-        {
-          "key": "stroke",
-          "label": "Stroke",
-          "unit": "mm",
-          "min": 18,
-          "max": 60,
-          "value": 34
-        },
-        {
-          "key": "rod",
-          "label": "Rod length",
-          "unit": "mm",
-          "min": 44,
-          "max": 116,
-          "value": 80
-        },
-        {
-          "key": "clearance",
-          "label": "Bore clearance",
-          "unit": "mm",
-          "min": 0.2,
-          "max": 0.5,
-          "value": 0.3
-        }
-      ],
-      "printedParts": 5,
       "instances": 7,
-      "grams": 130.7,
-      "triangles": 6444,
+      "grams": 150.2,
+      "triangles": 10124,
       "hardware": 0,
       "bed": [
-        182,
-        98
+        132,
+        124
+      ],
+      "order": 80
+    },
+    {
+      "slug": "stepper-motor",
+      "title": "Bipolar stepper motor",
+      "category": "Motors & actuators",
+      "kind": "motor",
+      "tagline": "No brushes, no position sensor — just toothed magnets pulled in exact angular quanta by energizing Phase A and Phase B in sequence.",
+      "question": "How does a 3D printer or CNC router move to an exact fraction of a millimetre without an encoder — and what is the difference between full-stepping, half-stepping, and microstepping?",
+      "bigIdea": "The rotor has N teeth while the stator poles sits at 90° electrical quadrature. Energizing Phase A aligns one pair of rotor teeth; switching to Phase B pulls the nearest misaligned tooth pair into alignment, advancing the shaft by an exact fraction of a tooth pitch (90° / N).",
+      "params": [
+        {
+          "key": "teeth",
+          "label": "Rotor teeth",
+          "unit": "",
+          "min": 6,
+          "max": 14,
+          "value": 10
+        },
+        {
+          "key": "mode",
+          "label": "Excitation mode",
+          "unit": "",
+          "min": null,
+          "max": null,
+          "value": "full"
+        },
+        {
+          "key": "current",
+          "label": "Coil current",
+          "unit": "mA",
+          "min": 200,
+          "max": 1400,
+          "value": 800
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 6,
+      "instances": 6,
+      "grams": 151,
+      "triangles": 7192,
+      "hardware": 0,
+      "bed": [
+        124,
+        124
+      ],
+      "order": 90
+    },
+    {
+      "slug": "gear-motor",
+      "title": "DC gearmotor & encoder",
+      "category": "Motors & actuators",
+      "kind": "motor",
+      "tagline": "Three compound spur reduction stages multiply torque 15× while a rear quadrature encoder tracks speed and direction.",
+      "question": "How does a tiny N20 or yellow TT gearmotor lift heavy loads that would stall a bare DC motor — and how do two Hall sensors on the rear shaft measure exact RPM and direction?",
+      "bigIdea": "A gearmotor cascades multiple compound pinion-and-gear pairs inside one frame so gear ratios multiply (G = R₁ × R₂ × R₃): speed drops by G while output torque multiplies by η·G. Mounting a quadrature encoder disc on the fast motor side multiplies tick resolution by G at the output shaft.",
+      "params": [
+        {
+          "key": "stage3",
+          "label": "Final output teeth",
+          "unit": "",
+          "min": 20,
+          "max": 30,
+          "value": 26
+        },
+        {
+          "key": "pwm",
+          "label": "PWM duty cycle",
+          "unit": "%",
+          "min": 15,
+          "max": 100,
+          "value": 75
+        },
+        {
+          "key": "load",
+          "label": "Output load torque",
+          "unit": "%",
+          "min": 0,
+          "max": 85,
+          "value": 25
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 7,
+      "instances": 10,
+      "grams": 102.5,
+      "triangles": 33460,
+      "hardware": 5,
+      "bed": [
+        148,
+        88
+      ],
+      "order": 95
+    },
+    {
+      "slug": "servo-motor",
+      "title": "Positional servo motor",
+      "category": "Motors & actuators",
+      "kind": "motor",
+      "tagline": "Inside the plastic case: a tiny DC motor, a compound reduction geartrain, and a potentiometer that closes the position feedback loop.",
+      "question": "How does a 3-wire hobby servo know its exact shaft angle — and how does a 1000–2000 µs pulse tell the internal DC motor when to spin and when to stop?",
+      "bigIdea": "A hobby servo is not a special kind of electric motor — it is a complete closed-loop control system in a box: a fast DC motor, a high-ratio compound gear train, a potentiometer wired as a voltage divider on the output shaft, and a comparator chip that drives the motor until measured angle equals commanded pulse width.",
+      "params": [
+        {
+          "key": "pulse",
+          "label": "Command pulse",
+          "unit": "µs",
+          "min": 1000,
+          "max": 2000,
+          "value": 1500
+        },
+        {
+          "key": "sweep",
+          "label": "Dynamic sweep",
+          "unit": "°",
+          "min": 0,
+          "max": 140,
+          "value": 90
+        },
+        {
+          "key": "kp",
+          "label": "Loop stiffness (Kp)",
+          "unit": "",
+          "min": 2,
+          "max": 10,
+          "value": 7
+        },
+        {
+          "key": "clearance",
+          "label": "Bore clearance",
+          "unit": "mm",
+          "min": 0.2,
+          "max": 0.5,
+          "value": 0.3
+        }
+      ],
+      "printedParts": 7,
+      "instances": 8,
+      "grams": 102.2,
+      "triangles": 26548,
+      "hardware": 0,
+      "bed": [
+        138,
+        92
       ],
       "order": 100
     }

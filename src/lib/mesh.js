@@ -83,7 +83,11 @@ export function pointInPolygon(pt, poly) {
 
 /* ------------------------------------------------------------ triangulator */
 
-const xAt = (a, b, y) => a[0] + ((y - a[1]) * (b[0] - a[0])) / (b[1] - a[1]);
+const xAt = (a, b, y) => {
+  if (Math.abs(y - a[1]) <= 1e-9) return a[0];
+  if (Math.abs(y - b[1]) <= 1e-9) return b[0];
+  return a[0] + ((y - a[1]) * (b[0] - a[0])) / (b[1] - a[1]);
+};
 
 /** Points of `xs` strictly between xa and xb, sorted, plus the ends. */
 function splitLine(y, xa, xb, xs) {

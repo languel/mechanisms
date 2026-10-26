@@ -1,20 +1,19 @@
-/* build.js — turn the mechanism modules into the published site.
+/* build.js — turn the mechanism & motor modules into the published site.
 
    node src/build.js            build every mechanism page, card and the catalogue
    node src/build.js --only=slug
 
    For each mechanism it proves the print pack (every part closed, correctly
-   wound, no overlapping solids), draws the isometric card image from the same
-   geometry, writes the page, and refreshes the catalogue and manifest. There is
-   no bundler and no dependency: the site is static files, and the browser loads
-   the very modules this script just checked.
+   wound, no overlapping solids), draws the hidden-line-removed Teardown card
+   image from the same geometry, writes the page, and refreshes the catalogue
+   and manifest.
 */
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 
-import { partStats, printPack } from './lib/export.js';
+import { printPack } from './lib/export.js';
 import { isoFigure } from './lib/iso.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -83,24 +82,45 @@ async function buildOne(slug) {
     if (!quiet) for (const f of failed) console.warn(`  ! ${slug}: ${f.text}`);
   }
 
-  // The card image: the machine at the angle the mechanism says shows it best.
-  const shot = mod.meta.screenshot || {};
-  const angle = shot.t ?? 0;
-  const pose = mod.pose(values, angle);
-  const fig = isoFigure(out.parts, pose, {
-    width: 900,
-    maxHeight: 700,
-    azimuth: shot.azimuth ?? -0.62,
-    elevation: shot.elevation ?? 0.82,
-    background: '#f6f1e7',
-    hardware: true,
-  });
-  await fs.writeFile(path.join(IMG_DIR, `${slug}.svg`), fig.svg);
+  // The card image: rendered with Teardown hidden-line removal at the module's chosen angle.
+  // Default grid card (`${slug}.svg`) is Patent Line (fill: false); `${slug}-color.svg` is Sky & Gold fill.
+  const svgPath = path.join(IMG_DIR, `${slug}.svg`);
+  const colorSvgPath = path.join(IMG_DIR, `${slug}-color.svg`);
+  let svgText;
+  if (process.argv.includes('--html-only')) {
+    svgText = await fs.readFile(svgPath, 'utf8').catch(() => '');
+  }
+  if (!svgText) {
+    const shot = mod.meta.screenshot || {};
+    const angle = shot.t ?? 0;
+    const pose = mod.pose(values, angle);
+    const figPatent = isoFigure(out.parts, pose, {
+      width: 900,
+      maxHeight: 680,
+      azimuth: shot.azimuth ?? -0.62,
+      elevation: shot.elevation ?? 0.82,
+      background: '#f7f2e7',
+      fill: 'hatch',
+      hatch: true,
+      prominentLines: true,
+      hardware: true,
+    });
+    svgText = figPatent.svg;
+    await fs.writeFile(svgPath, svgText);
 
-  // Small inline copy for the page's no-WebGL fallback.
-  const fallback = isoFigure(out.parts, pose, {
-    width: 760, maxHeight: 560, azimuth: shot.azimuth ?? -0.62, elevation: shot.elevation ?? 0.82,
-  });
+    const figColor = isoFigure(out.parts, pose, {
+      width: 900,
+      maxHeight: 680,
+      azimuth: shot.azimuth ?? -0.62,
+      elevation: shot.elevation ?? 0.82,
+      background: '#f6f1e7',
+      fill: true,
+      hatch: false,
+      prominentLines: true,
+      hardware: true,
+    });
+    await fs.writeFile(colorSvgPath, figColor.svg);
+  }
 
   const tpl = await readTemplate('mechanism.html');
   const html = fill(tpl, {
@@ -112,7 +132,7 @@ async function buildOne(slug) {
     question: esc(mod.meta.question),
     bigIdea: esc(mod.meta.bigIdea),
     rpm: `${Math.round(0.14 * 60)} rpm`,
-    fallback: fallback.svg,
+    fallback: svgText,
   });
 
   const dir = path.join(MECH_DIR, slug);
@@ -123,6 +143,7 @@ async function buildOne(slug) {
     slug,
     title: mod.meta.title,
     category: mod.meta.category,
+    kind: mod.meta.kind || 'mechanism',
     tagline: mod.meta.tagline,
     question: mod.meta.question,
     bigIdea: mod.meta.bigIdea,
@@ -139,22 +160,46 @@ async function buildOne(slug) {
   };
 }
 
-function catalogHtml(items, tpl) {
-  const categories = [...new Set(items.map((i) => i.category))];
-  const cards = items.map((m) => `
+const BRIEFS = {
+  'gear-pair': 'Transmits continuous rotation between parallel shafts with precise whole-number speed and torque ratios.',
+  'rack-pinion': 'Converts rotary shaft motion into straight-line travel for steering racks, CNC gantries, and linear stages.',
+  'crank-slider': 'Transforms continuous rotation into reciprocating linear piston motion for engines, pumps, and compressors.',
+  'cam-follower': 'Translates steady rotation into custom lift, dwell, and timed motion profiles for automation and valve trains.',
+  'ratchet-pawl': 'Allows rotation in only one direction while preventing reverse backdrive for winches, jacks, and ratchets.',
+  'geneva-indexer': 'Translates continuous rotation into discrete intermittent stepped dwells for film projectors and rotary tool changers.',
+  'servo-crank': 'Translates bounded 180° hobby servo rotation into precise linear positioning for animatronics and robotics.',
+  'four-bar': 'Turns continuous rotation into sweeping oscillating arcs for windshield wipers, deployable linkages, and steering geometry.',
+  'scotch-yoke': 'Converts rotational motion into pure harmonic linear oscillation without angular connecting-rod distortion.',
+  'belt-pulley': 'Transmits smooth, quiet rotary motion across wide shaft spans with zero backlash.',
+  'dc-motor': 'High-speed continuous electric motor driven by DC voltage, for wheels, propellers, and centrifugal pumps.',
+  'stepper-motor': 'Provides precise open-loop discrete angular positioning in 1.8° increments for 3D printers and CNC machines.',
+  'servo-motor': 'Closed-loop geared actuator holding exact angular positions (0–180°) via PWM pulse control.',
+  'gear-motor': 'Compound spur reduction gearbox delivering high output torque with integrated quadrature encoder feedback.',
+};
+
+function renderCard(m, indexLabel) {
+  const brief = m.brief || BRIEFS[m.slug] || m.tagline || m.question;
+  return `
       <a class="cardlink" href="mechanisms/${m.slug}/index.html" data-category="${esc(m.category)}">
-        <img class="thumb" src="assets/img/${m.slug}.svg" alt="${esc(m.title)} — assembled, in isometric view" loading="lazy" width="900" height="700">
+        <div class="card-plate-head">
+          <span class="plate-no">${esc(indexLabel)}</span>
+          <span class="plate-cat">${esc(m.category)}</span>
+        </div>
+        <img class="thumb" src="assets/img/${m.slug}.svg" data-patent-src="assets/img/${m.slug}.svg" data-color-src="assets/img/${m.slug}-color.svg" alt="${esc(m.title)} — technical assembly drawing" loading="lazy" width="900" height="680">
         <div class="body">
           <h3>${esc(m.title)}</h3>
-          <p class="q">${esc(m.question)}</p>
-          <div class="tags">
-            <span class="tag">${esc(m.category)}</span>
-            <span class="tag">${m.printedParts} printed parts</span>
-            <span class="tag">${m.grams.toFixed(0)} g</span>
-            <span class="tag">${m.params.length} parameters</span>
-          </div>
+          <p class="desc">${esc(brief)}</p>
         </div>
-      </a>`).join('');
+      </a>`;
+}
+
+function catalogHtml(items, tpl) {
+  const mechanismsOnly = items.filter((i) => i.kind !== 'motor' && i.category !== 'Motors & actuators');
+  const motorsOnly = items.filter((i) => i.kind === 'motor' || i.category === 'Motors & actuators');
+  const categories = [...new Set(items.map((i) => i.category))];
+
+  const cards = mechanismsOnly.map((m, idx) => renderCard(m, `FIG. ${String(idx + 1).padStart(2, '0')}`)).join('');
+  const motorCards = motorsOnly.map((m, idx) => renderCard(m, `ACTUATOR ${String(idx + 1).padStart(2, '0')}`)).join('');
 
   const chips = ['All', ...categories].map((c, i) => `
         <button class="chip" type="button" data-filter="${esc(c)}" aria-pressed="${i === 0}">${esc(c)}</button>`).join('');
@@ -164,8 +209,11 @@ function catalogHtml(items, tpl) {
 
   return fill(tpl, {
     cards,
+    motorCards,
     chips,
     count: items.length,
+    mechCount: mechanismsOnly.length,
+    motorCount: motorsOnly.length,
     totalParts,
     totalGrams: totalGrams.toFixed(0),
     updated: new Date().toISOString().slice(0, 10),
@@ -188,7 +236,6 @@ async function main() {
       + `${info.triangles.toLocaleString('en-US')} triangles · ${(performance.now() - t0).toFixed(0)} ms`);
   }
 
-  // The catalogue needs every mechanism, even when one was rebuilt on its own.
   const manifestPath = path.join(ROOT, 'manifest.json');
   let all = results;
   if (only) {
@@ -199,8 +246,6 @@ async function main() {
   }
   all.sort((a, b) => (a.order - b.order) || a.title.localeCompare(b.title));
 
-  // No build timestamp: the site has to rebuild byte-for-byte so CI can prove
-  // the committed pages match the source (see .github/workflows/ci.yml).
   await fs.writeFile(manifestPath, `${JSON.stringify({
     standard: { rod: 3, fit: 0.3, plateT: 4, bodyT: 6, layerPitch: 8 },
     mechanisms: all,
@@ -208,7 +253,7 @@ async function main() {
 
   const tpl = await readTemplate('catalog.html');
   await fs.writeFile(path.join(ROOT, 'index.html'), catalogHtml(all, tpl));
-  log(`catalogue: ${all.length} mechanisms`);
+  log(`catalogue: ${all.length} modules`);
 }
 
 main().catch((err) => {

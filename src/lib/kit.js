@@ -150,7 +150,7 @@ export function part({
  */
 export function framePart({
   id = 'frame', name = 'Base frame', w, d, t = KIT.plateT, holes = [], rails = [], ticks = null,
-  color = '#d9d0c1', note = 'the whole machine is bolted to this plate',
+  color = '#ece6da', note = 'the whole machine is bolted to this plate',
 }) {
   const rings = holes.map((h) => h.ring ?? h);
   if (ticks) {
@@ -226,3 +226,218 @@ export function armSolids({ length, width = 13, boreR, bossR = 6.8, t = KIT.body
     }),
   ];
 }
+
+/* ------------------------------------------- motor & servo shaft bores */
+
+export const SHAFT_OPTIONS = [
+  { value: 'post', label: 'Baseplate pivot post (Ø6.8 mm slip-fit)' },
+  { value: 'nema17', label: 'NEMA 17 stepper (5 mm D-shaft)' },
+  { value: 'n20', label: 'N20 / TT gearmotor (3 mm D-shaft)' },
+  { value: 'sg90', label: 'SG90 / MG90S micro servo (4.8 mm spline)' },
+  { value: 'mg996r', label: 'MG996R standard servo (5.8 mm 25T spline)' },
+  { value: 'dowel8', label: '8 mm wood / steel shaft (press-fit)' },
+];
+
+/** Flat-sided D-shaft bore centered at (0,0) with flat on the +x side. */
+export function dShaftProfile(r, flatX, n = 36) {
+  const xFlat = Math.min(r - 0.15, Math.max(-r + 0.2, flatX));
+  const a0 = Math.acos(xFlat / r);
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const a = a0 + ((Math.PI * 2 - 2 * a0) * i) / n;
+    pts.push([r * Math.cos(a), r * Math.sin(a)]);
+  }
+  return pts;
+}
+
+/** Return the 2D bore ring, outer hub radius, and human description for a chosen motor/servo shaft. */
+export function shaftSpec(shaft = 'post', clearance = 0.3) {
+  const fit = Math.max(0.08, clearance * 0.45);
+  switch (shaft) {
+    case 'nema17': {
+      const r = 2.5 + fit * 0.5;
+      const flatX = 2.0 + fit * 0.4; // 4.5 mm across the D-flat on a 5 mm shaft
+      return {
+        id: 'nema17',
+        label: '5 mm NEMA 17 D-shaft',
+        ring: dShaftProfile(r, flatX, 36),
+        postR: 2.5,
+        hubR: 8.5,
+        hasFramePost: false,
+        note: '5.0 mm D-bore (4.5 mm across flat) for direct press-fit onto a NEMA 17 stepper shaft',
+      };
+    }
+    case 'n20': {
+      const r = 1.5 + fit * 0.45;
+      const flatX = 1.0 + fit * 0.35; // 2.5 mm across D-flat on a 3 mm shaft
+      return {
+        id: 'n20',
+        label: '3 mm N20 D-shaft',
+        ring: dShaftProfile(r, flatX, 32),
+        postR: 1.5,
+        hubR: 7.5,
+        hasFramePost: false,
+        note: '3.0 mm D-bore (2.5 mm across flat) for N20 / TT DC gearmotors',
+      };
+    }
+    case 'sg90': {
+      const r = 2.4 + fit * 0.4; // 4.8 mm SG90 21T spline press-fit
+      return {
+        id: 'sg90',
+        label: '4.8 mm SG90 spline',
+        ring: circle(0, 0, r, 21),
+        postR: 2.4,
+        hubR: 8.5,
+        hasFramePost: false,
+        note: 'Ø4.8 mm 21-tooth spline bore for SG90 / MG90S micro servos (secure with M2 × 6 screw)',
+      };
+    }
+    case 'mg996r': {
+      const r = 2.9 + fit * 0.4; // 5.8 mm Futaba/MG996R 25T spline
+      return {
+        id: 'mg996r',
+        label: '5.8 mm 25T servo spline',
+        ring: circle(0, 0, r, 25),
+        postR: 2.9,
+        hubR: 9.5,
+        hasFramePost: false,
+        note: 'Ø5.8 mm 25-tooth spline bore for MG996R / standard hobby servos (secure with M3 screw)',
+      };
+    }
+    case 'dowel8': {
+      const r = 4.0 + fit * 0.35;
+      return {
+        id: 'dowel8',
+        label: '8 mm round shaft',
+        ring: circle(0, 0, r, 40),
+        postR: 4.0,
+        hubR: 10.2,
+        hasFramePost: false,
+        note: 'Ø8.0 mm bore for standard 8 mm steel rod or wooden dowel',
+      };
+    }
+    case 'post':
+    default: {
+      const r = boreOn(clearance, POST_R);
+      return {
+        id: 'post',
+        label: 'Ø6.8 mm baseplate post',
+        ring: circle(0, 0, r, 40),
+        postR: POST_R,
+        hubR: 9.6,
+        hasFramePost: true,
+        note: `Ø${(r * 2).toFixed(2)} mm slip-fit bore on integral Ø6.8 mm baseplate post`,
+      };
+    }
+  }
+}
+
+/* ------------------------------------------------ color themes & hardware */
+
+export const COLOR_THEMES = {
+  'sky-gold': {
+    id: 'sky-gold',
+    label: 'Sky & Gold (Default)',
+    primary: '#dcb038',    // Warm Gold (driver / input)
+    secondary: '#5aa2d4',  // Light Sky Blue (driven / follower)
+    tertiary: '#82c0e4',   // Soft Powder Blue (coupler / cluster)
+    accent: '#489e8b',     // Seafoam Teal (springs / belts / coils)
+    frame: '#efeae0',      // Soft Warm Paper
+    cap: '#dfd8ca',        // Muted Linen
+    hardware: '#8d99a4',   // Brushed Steel
+  },
+  'cmyk': {
+    id: 'cmyk',
+    label: 'CMYK',
+    primary: '#e5c520',    // Process Yellow
+    secondary: '#009fe3',  // Process Cyan
+    tertiary: '#e6007e',   // Process Magenta
+    accent: '#2b2b2e',     // Process Key / Black
+    frame: '#f2f0eb',
+    cap: '#d2d0cc',
+    hardware: '#73737a',
+  },
+  'grayscale': {
+    id: 'grayscale',
+    label: 'Grayscale',
+    primary: '#4d5156',    // Dark neutral slate
+    secondary: '#8a9199',  // Mid gray
+    tertiary: '#b4bac2',   // Light slate gray
+    accent: '#34373b',     // Charcoal accent
+    frame: '#ebecee',
+    cap: '#d0d4da',
+    hardware: '#656b73',
+  },
+  'patent': {
+    id: 'patent',
+    label: 'Patent Ink',
+    primary: '#faf6ee',
+    secondary: '#faf6ee',
+    tertiary: '#faf6ee',
+    accent: '#faf6ee',
+    frame: '#faf6ee',
+    cap: '#faf6ee',
+    hardware: '#ede7da',
+    patent: true,
+  },
+  'hatches': {
+    id: 'hatches',
+    label: 'Different Hatches',
+    primary: '#e8e2d4',    // Distinct hatching pattern in 2D & shaded tonal fill
+    secondary: '#ded6c4',
+    tertiary: '#d4cbba',
+    accent: '#443f38',
+    frame: '#f4efe4',
+    cap: '#cac1b0',
+    hardware: '#8d877e',
+    hatch: true,
+  },
+  'spectrum': {
+    id: 'spectrum',
+    label: 'Spectrum (Muted)',
+    primary: '#c4695d',    // Muted terracotta / coral
+    secondary: '#4d8fa8',  // Muted cerulean / ocean
+    tertiary: '#d49b42',   // Muted amber
+    accent: '#629874',     // Muted sage green
+    frame: '#eeeae1',
+    cap: '#8c7fa6',        // Muted lavender
+    hardware: '#7a818c',
+  },
+};
+
+/**
+ * Determine whether a part should be toggled by the "Hardware" button:
+ * includes steel rods/fasteners (`kind === 'hardware'`), press-fit retainer
+ * caps (`cap*`), compliant return springs (`spring`), and motor endbells.
+ */
+export function isHardwarePart(part) {
+  if (!part) return false;
+  if (part.kind === 'hardware' || part.role === 'hardware' || part.role === 'fastener') return true;
+  if (/^cap(-|$)/.test(part.id) || part.id === 'spring' || part.id === 'endbell') return true;
+  return false;
+}
+
+/** Classify a part into a semantic color slot for theme switching. */
+export function partColorSlot(part) {
+  if (!part) return 'primary';
+  if (part.role === 'frame' || part.id === 'frame') return 'frame';
+  if (part.kind === 'hardware') return 'hardware';
+  if (/^cap(-|$)/.test(part.id)) return 'cap';
+  const c = String(part.color || '').toLowerCase();
+  if (c === '#ece6da' || c === '#efeae0') return 'frame';
+  if (c === '#e7dfd0' || c === '#dfd8ca') return 'cap';
+  if (c === '#2f7a54' || c === '#489e8b' || part.id === 'spring' || part.id === 'belt') return 'accent';
+  if (c === '#cf5a28' || c === '#cf6a34' || c === '#dcb038' || c === '#e2b842') return 'primary';
+  if (c === '#39699c' || c === '#3f6888' || c === '#5aa2d4' || c === '#67b0e0') return 'secondary';
+  if (c === '#b08b4a' || c === '#82c0e4' || c === '#e6c865') return 'tertiary';
+  return 'secondary';
+}
+
+/** Return the hex color for a part under the active color theme. */
+export function resolvePartColor(part, themeId = 'sky-gold') {
+  const theme = COLOR_THEMES[themeId] || COLOR_THEMES['sky-gold'];
+  const slot = partColorSlot(part);
+  return theme[slot] || part?.color || theme.primary;
+}
+
+

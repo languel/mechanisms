@@ -389,18 +389,23 @@ export function snap(v, step) {
  * Ratchet wheel outline: asymmetric teeth with a steep drive face and a long
  * back slope, so a pawl can ride over them in one direction only.
  */
-export function ratchetProfile({ teeth = 12, rOuter = 30, rRoot = 23, driveFlank = 8 }) {
+export function ratchetProfile({ teeth = 12, rOuter = 30, rRoot = 23 }) {
   const step = TAU / teeth;
   const pts = [];
   for (let k = 0; k < teeth; k++) {
     const a0 = k * step;
-    // root arc up to the steep face
-    pts.push(...arc(0, 0, rRoot, a0, a0 + step * 0.42, 4));
-    // steep drive face
-    const faceAngle = a0 + step * 0.42 + driveFlank * DEG;
-    pts.push([rOuter * Math.cos(faceAngle), rOuter * Math.sin(faceAngle)]);
-    // long back slope to the root
-    pts.push([rRoot * Math.cos(a0 + step * 0.92), rRoot * Math.sin(a0 + step * 0.92)]);
+    // Tooth crest at a0, descending along a smooth 86% back slope to rRoot
+    const rampSteps = 7;
+    for (let j = 0; j <= rampSteps; j++) {
+      const u = (0.86 * j) / rampSteps;
+      const r = rOuter - (rOuter - rRoot) * (j / rampSteps);
+      const a = a0 + u * step;
+      pts.push([r * Math.cos(a), r * Math.sin(a)]);
+    }
+    // Root pocket flat at the base of the steep radial drive face (86% -> 94% of step)
+    const aPocket = a0 + 0.94 * step;
+    pts.push([rRoot * Math.cos(aPocket), rRoot * Math.sin(aPocket)]);
+    // From 94% to 100% (next tooth's a0), the steep drive face rises sharply to rOuter
   }
   return { outer: dedupeRing(pts), step };
 }
@@ -432,39 +437,58 @@ export function genevaProfile({
   slots = 4,
   radius = 36,
   slotWidth = 8.2,
-  lockFactor = 0.62,
 }) {
   const n = slots;
   const R = radius;
-  const C = R / Math.sin(Math.PI / n);     // centre distance
-  const rho = R;                            // pin circle radius (tangent to the rim)
-  const slotBottom = Math.max(3.2, C - rho);
-  const rLock = Math.max(slotBottom + 1.2, R * lockFactor); // locking arc radius
-  const lockDisc = C - rLock;               // driver's locking disc radius
+  const beta0 = Math.PI / n;
+  // Exact tangent entry right triangle: R = C * cos(pi/n), pinRadius = R * tan(pi/n) = C * sin(pi/n)
+  // Ensure C - R >= 8.5 mm even for high slot counts (n = 7, 8) so the wheel rim clears the driver shaft
+  const C = Math.max(R / Math.cos(beta0), R + 8.5);
+  const rho = Math.sqrt(Math.max(16, C * C - R * R));
+  const slotBottom = Math.max(6.2, C - rho - 0.8);
   const step = TAU / n;
 
-  const dSlot = Math.asin(Math.min(0.85, slotWidth / 2 / R));
+  const dSlot = Math.asin(Math.min(0.75, slotWidth / 2 / R));
   const back = Math.asin(Math.min(0.85, slotWidth / 2 / slotBottom));
-  const beta = Math.min(step * 0.22, Math.asin(Math.min(0.85, lockDisc / C)));
+  const hornArc = Math.max(0.055, beta0 * 0.14);
+  const phiScallop = Math.max(0.08, beta0 - dSlot - hornArc);
+
+  // Exact concave scallop centered at the driver axle (C * cos(aMid), C * sin(aMid))
+  const rScallop = Math.sqrt(C * C + R * R - 2 * C * R * Math.cos(phiScallop));
+  const rLock = C - rScallop;
+  const lockDisc = Math.max(6.8, rScallop - 0.55);
 
   const pts = [];
   for (let k = 0; k < n; k++) {
     const a = k * step;
-    // the slot: in along one side, round the bottom, out along the other
+    // 1. Radial slot: in along -side, round the semicircular bottom, out along +side
     pts.push([R * Math.cos(a - dSlot), R * Math.sin(a - dSlot)]);
     pts.push([slotBottom * Math.cos(a - back), slotBottom * Math.sin(a - back)]);
     pts.push(...arc(0, 0, slotBottom, a - back, a + back, 8));
     pts.push([R * Math.cos(a + dSlot), R * Math.sin(a + dSlot)]);
-    // rim, from this slot round to the locking recess
-    pts.push(...arc(0, 0, R, a + dSlot, a + step / 2 - beta, 10));
-    // shoulder in to the locking arc
-    pts.push([rLock * Math.cos(a + step / 2 - beta), rLock * Math.sin(a + step / 2 - beta)]);
-    // the locking arc itself
-    pts.push(...arc(0, 0, rLock, a + step / 2 - beta, a + step / 2 + beta, 10));
-    // shoulder back out to the rim
-    pts.push([R * Math.cos(a + step / 2 + beta), R * Math.sin(a + step / 2 + beta)]);
-    // rim on to the next slot's mouth
-    pts.push(...arc(0, 0, R, a + step / 2 + beta, a + step - dSlot, 10));
+
+    // 2. Horn tip arc on outer radius R
+    const aMid = a + beta0;
+    const aScStart = aMid - phiScallop;
+    const aScEnd = aMid + phiScallop;
+    pts.push(...arc(0, 0, R, a + dSlot, aScStart, 4));
+
+    // 3. True concave dwell scallop centered at the mating driver centre (cx, cy)
+    const cx = C * Math.cos(aMid);
+    const cy = C * Math.sin(aMid);
+    const p1x = R * Math.cos(aScStart) - cx;
+    const p1y = R * Math.sin(aScStart) - cy;
+    const p2x = R * Math.cos(aScEnd) - cx;
+    const p2y = R * Math.sin(aScEnd) - cy;
+    let ang1 = Math.atan2(p1y, p1x);
+    let ang2 = Math.atan2(p2y, p2x);
+    // Sweep the inward arc (around angle aMid + PI) from p1 to p2
+    while (ang2 > ang1) ang2 -= TAU;
+    if (ang1 - ang2 > Math.PI) ang2 += TAU;
+    pts.push(...arc(cx, cy, rScallop, ang1, ang2, 18));
+
+    // 4. Horn tip arc on outer radius R to the next slot mouth
+    pts.push(...arc(0, 0, R, aScEnd, a + step - dSlot, 4));
   }
 
   return {
@@ -475,6 +499,7 @@ export function genevaProfile({
     pinRadius: rho,
     slotBottom,
     lockRadius: rLock,
+    rScallop,
     lockDisc,
     step,
   };

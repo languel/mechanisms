@@ -7,17 +7,21 @@
 <meta name="description" content="{{description}}">
 <meta name="color-scheme" content="light">
 <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../assets/vendor/katex/katex.min.css">
 <link rel="stylesheet" href="../../assets/css/site.css">
+<script defer src="../../assets/vendor/katex/katex.min.js"></script>
+<script defer src="../../assets/vendor/katex/contrib/auto-render.min.js"></script>
 </head>
 <body data-mechanism="{{slug}}" data-module="./mechanism.js">
 
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="../../index.html"><b>Mechanisms</b> <span>— motion you can print</span></a>
+    <a class="brand" href="../../index.html"><b>Motion Mechanisms</b></a>
     <nav>
-      <a href="../../index.html">Catalogue</a>
-      <a href="../../docs/print-standard.html">Print standard</a>
-      <a href="../../docs/design-notes.html">Design notes</a>
+      <a href="../../index.html#mechanisms">Mechanisms</a>
+      <a href="../../index.html#motors">Motors</a>
+      <a href="../../index.html#fabrication">Fabrication</a>
+      <button class="theme-mode-btn" id="theme-mode-btn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
     </nav>
   </div>
 </header>
@@ -36,21 +40,53 @@
       <div id="viewport">
         <div id="fallback" aria-hidden="true">{{fallback}}</div>
         <canvas id="stage-canvas"></canvas>
+        <div id="blueprint-view" class="blueprint-view hidden" aria-live="polite"></div>
         <div class="stage-tools">
-          <button class="chip" id="ghost" type="button" aria-pressed="false" title="Make the frame see-through">See inside</button>
-          <button class="chip" id="hardware" type="button" aria-pressed="true" title="Show or hide rods and collars">Hardware</button>
-          <button class="chip" id="reset" type="button" title="Back to the start">Reset</button>
-          <span class="chip" id="angle" title="Input shaft angle">0°</span>
+          <div class="mode-group" role="group" aria-label="View mode">
+            <button class="chip" id="mode-3d" type="button" aria-pressed="true" title="Interactive 3D CAD workbench (drag to orbit, scroll to zoom)">3D Stage</button>
+            <button class="chip" id="mode-blueprint" type="button" aria-pressed="false" title="Hidden-line-removed Teardown technical drawing">Teardown SVG</button>
+            <button class="chip" id="mode-bed" type="button" aria-pressed="false" title="220 × 220 mm 3D printer build plate layout">Print Bed</button>
+          </div>
+          <div class="cam-group" role="group" aria-label="Camera angle presets">
+            <button class="chip small-chip" id="cam-iso" type="button" title="Isometric 3D view">Iso</button>
+            <button class="chip small-chip" id="cam-top" type="button" title="Top-down plan view">Top</button>
+            <button class="chip small-chip" id="cam-bottom" type="button" title="Peek from below (underside 3D view)">Bottom</button>
+            <button class="chip small-chip" id="cam-front" type="button" title="Front elevation view">Front</button>
+            <button class="chip small-chip" id="cam-side" type="button" title="Side elevation view">Side</button>
+          </div>
+          <div class="tool-group">
+            <select class="chip theme-select" id="theme-select" aria-label="Color theme" title="Choose part color theme">
+              <option value="sky-gold">Theme: Sky &amp; Gold</option>
+              <option value="cmyk">Theme: CMYK</option>
+              <option value="grayscale">Theme: Grayscale</option>
+              <option value="patent">Theme: Patent Ink</option>
+              <option value="hatches">Theme: Different Hatches</option>
+              <option value="spectrum">Theme: Spectrum (Muted)</option>
+            </select>
+            <button class="chip" id="trace-btn" type="button" aria-pressed="false" title="Toggle continuous 3D motion path trace of coupler, slider or output point">Trace motion</button>
+            <button class="chip" id="patent-btn" type="button" aria-pressed="false" title="Toggle 19th-century patent line-drawing shader">Patent line</button>
+            <button class="chip" id="hide-base-btn" type="button" aria-pressed="false" title="Hide the baseplate to inspect floating mechanism parts">Hide base</button>
+            <button class="chip" id="explode-btn" type="button" aria-pressed="false" title="Toggle exploded assembly view">Explode</button>
+            <button class="chip" id="ghost" type="button" aria-pressed="false" title="Make the frame see-through">See inside</button>
+            <button class="chip" id="hardware" type="button" aria-pressed="true" title="Show or hide retainer caps, springs, fasteners &amp; motor shaft indicator">Hardware</button>
+            <button class="chip" id="reset" type="button" title="Reset camera, explosion, and angle">Reset</button>
+            <span class="chip mono-chip" id="angle" title="Input shaft / cycle angle">0°</span>
+          </div>
         </div>
+        <button class="motor-badge" id="motor-badge" type="button" hidden title="Click to highlight the motor / input drive shaft"></button>
+        <div class="orbit-hint" id="orbit-hint">Drag to orbit 3D · Scroll to zoom · Shift-drag to pan</div>
       </div>
       <div class="stage-foot">
         <div class="readouts" id="readouts"></div>
         <div class="transport">
           <button class="btn" id="play" type="button" aria-pressed="true"><span id="play-label">Pause</span></button>
-          <label class="scrub">Shaft
+          <label class="scrub">Cycle
             <input type="range" id="scrub" min="0" max="360" step="1" value="0" aria-label="Input shaft angle">
           </label>
-          <label class="scrub" title="How fast the input shaft turns">
+          <label class="scrub" title="Explode the 3D assembly stack along its Z axes">Explode
+            <input type="range" id="stage-explode" min="0" max="1" step="0.02" value="0" aria-label="Explode assembly">
+          </label>
+          <label class="scrub" title="How fast the input cycle runs">Speed
             <input type="range" id="speed" min="0.02" max="0.4" step="0.01" value="0.14" aria-label="Speed">
             <output id="speed-out">{{rpm}}</output>
           </label>
@@ -59,6 +95,89 @@
     </div>
 
     <p class="bigidea" id="bigidea">{{bigIdea}}</p>
+
+    <section class="card physics-card" id="physics-card" hidden>
+      <div class="circuit-head">
+        <div>
+          <div class="kicker" id="physics-kicker">Electromechanics · Live Physics &amp; Signals</div>
+          <h2 id="physics-title">Magnetic Field, Torque Vectors &amp; Electrical Waveforms</h2>
+        </div>
+        <span class="chip small-chip mono-chip" id="physics-status">LIVE SYNC</span>
+      </div>
+      <div id="physics-body"></div>
+    </section>
+
+    <section class="card motor-terms-card" id="motor-terms-card" hidden>
+      <div class="circuit-head">
+        <div>
+          <div class="kicker">Actuator Reference · Electro-Mechanical Physics</div>
+          <h2>Key Terms &amp; Formulas: RPM, Torque, Load &amp; Signals</h2>
+        </div>
+      </div>
+      <div class="terms-grid">
+        <div class="term-card">
+          <div class="term-head"><b>RPM &amp; Angular Velocity</b><code>\omega = \frac{2\pi \cdot \text{RPM}}{60}</code></div>
+          <p><b>Revolutions Per Minute</b> measures shaft speed. Converted to angular velocity $\omega$ (rad/s) for mechanical work. Power is $P = \tau \cdot \omega$.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Torque &amp; Stall Torque</b><code>\tau = F \times r \text{ [kg}\cdot\text{cm / N}\cdot\text{m]}</code></div>
+          <p>Rotational force. <b>Stall torque</b> is maximum output at 0 RPM; <b>rated torque</b> is safe continuous limit before thermal overheating. $1\text{ N}\cdot\text{m} \approx 10.2\text{ kg}\cdot\text{cm}$.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Mechanical Load</b><code>\tau_{\text{load}} \text{ vs. Speed Curve}</code></div>
+          <p>Resistance torque on the shaft. Higher load slows the rotor, decreasing back-EMF so armature current rises automatically to match load torque.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Back-EMF (Generator Effect)</b><code>V_{\text{bemf}} = k_e \cdot \omega</code></div>
+          <p>Coils spinning through the stator magnetic field induce reverse voltage opposing supply voltage. Net driving voltage is $V_{\text{net}} = V_{\text{avg}} - V_{\text{bemf}}$.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Gear Ratio &amp; Efficiency</b><code>\tau_{\text{out}} = \eta \cdot G \cdot \tau_{\text{motor}}</code></div>
+          <p>A gearhead divides speed $\omega_{\text{out}} = \omega_m / G$ while multiplying torque by $\eta \cdot G$, where $\eta \approx 90\text{–}95\%$ per spur gear stage.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Current &amp; Thermal Dissipation</b><code>I = \frac{V - V_{\text{bemf}}}{R}, P = I^2 R</code></div>
+          <p>At stall ($\omega = 0$), $V_{\text{bemf}} = 0$ so current peaks at $I_{\text{stall}} = V/R_{\text{coil}}$, causing rapid thermal rise. Never stall under full voltage.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Control: PWM vs. Pulse Width</b><code>\text{PWM \% vs. 1000–2000 }\mu\text{s}</code></div>
+          <p>DC &amp; gearmotors use high-frequency PWM duty cycle to vary average voltage/speed; hobby servos read absolute 50 Hz pulse duration to command shaft position.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Encoder Resolution (CPR)</b><code>\text{CPR} = 4 \times \text{slots} \times G</code></div>
+          <p>Quadrature encoders count all rising and falling edges of channels A &amp; B ($4\times$ decoding), giving sub-degree precision per output turn.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card circuit-card" id="circuit-card" hidden>
+      <div class="circuit-head">
+        <div>
+          <div class="kicker">Physical Computing · Arduino Integration</div>
+          <h2 id="circuit-title">Driver Wiring &amp; Sketch</h2>
+        </div>
+        <button class="btn small" id="copy-code" type="button">Copy Arduino Sketch</button>
+      </div>
+      <div class="circuit-grid">
+        <div class="wiring-col">
+          <div class="wiring-meta" id="wiring-meta"></div>
+          <table class="wiring-table">
+            <thead>
+              <tr><th>Controller / Source</th><th>Driver / Actuator Pin</th><th>Function</th></tr>
+            </thead>
+            <tbody id="wiring-rows"></tbody>
+          </table>
+        </div>
+        <div class="code-col">
+          <pre class="code-block"><code id="arduino-code"></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="card notes" style="margin-top:16px">
+      <h2>Engineering Breakdown</h2>
+      <div id="notes"></div>
+    </section>
 
     <noscript>
       <div class="noscript">
@@ -70,52 +189,48 @@
 
   <aside class="panel">
     <section class="card">
-      <h2>Print parameters <span class="hint">live model</span></h2>
+      <h2>Print parameters <span class="hint">live parametric CAD</span></h2>
       <div id="params"></div>
       <div class="checks" id="checks"></div>
       <div class="param" style="margin-top:10px">
-        <label for="explode">Explode the stack</label>
+        <label for="explode">Explode assembly stack</label>
+        <output for="explode" id="explode-out">0%</output>
         <input type="range" id="explode" min="0" max="1" step="0.02" value="0" aria-label="Explode the stack">
       </div>
     </section>
 
     <section class="card">
-      <h2>The question</h2>
-      <p id="question" style="font-size:13.5px;color:var(--ink-soft)"></p>
+      <h2>3D print pack, STL &amp; laser-cut SVG</h2>
+      <div id="export"></div>
     </section>
 
     <section class="card">
-      <h2>How it works</h2>
+      <h2>Step-by-step tour <span class="hint">click to jump</span></h2>
       <ol class="steps" id="steps"></ol>
     </section>
 
     <section class="card">
-      <h2>Parts <span class="hint">click to inspect</span></h2>
+      <h2>Parts &amp; anatomy <span class="hint">click to inspect</span></h2>
       <ul class="parts" id="parts"></ul>
       <div id="part-detail" hidden style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)"></div>
     </section>
 
     <section class="card">
-      <h2>Print pack</h2>
-      <div id="export"></div>
+      <h2>The question</h2>
+      <p id="question" style="font-size:13.5px;color:var(--ink-soft);margin:0"></p>
     </section>
 
-    <section class="card">
-      <h2>Hardware</h2>
+    <section class="card" id="hardware-card">
+      <h2>Non-printed hardware</h2>
       <ul id="hardware-list" style="margin:0;padding-left:18px;font-size:12.5px;color:var(--ink-soft)"></ul>
-    </section>
-
-    <section class="card notes">
-      <h2>Breakdown</h2>
-      <div id="notes"></div>
     </section>
   </aside>
 </main>
 
 <footer class="site">
   <div class="wrap">
-    <span>Mechanisms — a catalogue of motion, drawn and modelled from the same numbers.</span>
-    <span><a href="../../index.html">All mechanisms</a> · <a href="../../docs/print-standard.html">Print standard</a></span>
+    <span>Motion Mechanisms — parametric physical computing &amp; 3D print generator.</span>
+    <span><a href="https://507movements.com/" target="_blank" rel="noopener">507 Mechanical Movements ↗</a> · <a href="../../docs/print-standard.html">Print standard</a> · <a href="../../docs/design-notes.html">Design notes</a></span>
   </div>
 </footer>
 

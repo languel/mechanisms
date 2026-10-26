@@ -1,109 +1,108 @@
-/* Crank and slider — the mechanism inside every engine, pump and compressor.
+/* Crank and slider — the mechanism inside every engine, pump and compressor
+   (507 Mechanical Movements #92).
 
-   Geometry is authored in millimetres, print-flat: z = 0 is the bed face. The
-   assembled machine stacks the same parts above the base plate, so the page
-   draws exactly the triangles the STL export writes.
-
+   Geometry is authored in millimetres, print-flat: z = 0 is the bed face.
    Reference frame: the crank axis is the origin, the slider runs along +x, and
-   the crank turns anticlockwise.
+   the crank turns anticlockwise. The connecting rod rides on a raised plane
+   above the flush crank axle cap so the crank can spin a full 360° without interference.
 */
 
 import { KIT, slab, part, roundedRect, circle, rect } from '../../src/lib/kit.js';
-import { slot } from '../../src/lib/profiles.js';
+import { slot, capsule } from '../../src/lib/profiles.js';
 
 const D = Math.PI / 180;
 
 export const meta = {
   slug: 'crank-slider',
   title: 'Crank and slider',
-  tagline: 'One part turns, the other can only slide. Everything about an engine follows '
-    + 'from the link between them.',
+  movement: '507 Movements #92',
+  motorMount: { partId: 'crank', label: 'DC Gearmotor / Crank Shaft', direction: 'CCW' },
+  tagline: 'One part turns continuously; the other can only slide. Every piston engine, pump and compressor is built on the link between them.',
   category: 'Rotary → linear',
   question: 'If the crank turns at a constant speed, why does the slider race through the middle '
-    + 'of its stroke and stop dead at each end?',
-  bigIdea: 'The slider only sees the part of the crank pin’s circle that points along the rails, '
-    + 'so its speed rises and falls twice per turn while the crank never changes pace.',
+    + 'of its stroke, stop dead at each end, and move asymmetrically between the two halves?',
+  bigIdea: 'The slider only sees the horizontal projection of the crank pin’s circle plus the cosine '
+    + 'foreshortening of the tilted connecting rod — so its stroke is exactly 2r, while the rod-to-crank '
+    + 'ratio L/r controls how much sideways thrust the guide rails must absorb.',
   notes: [
     {
-      h: 'What each part does',
-      p: 'The <b>crank</b> carries a pin at radius <i>r</i> from the axle. The <b>connecting rod</b> '
-        + 'is pinned to that pin at one end and to the <b>slider</b> at the other. The slider is '
-        + 'trapped between two rails, so the rod cannot swing freely: as the crank turns, the rod’s '
-        + 'far end is pushed along the rails. The crank pin travels a full circle; the slider only '
-        + 'sees the horizontal part of it, which is why the stroke is exactly 2<i>r</i>.',
+      h: 'Three moving parts, two dead centres',
+      p: 'The <b>crank</b> carries an eccentric pin at radius <i>r</i>. The <b>connecting rod</b> '
+        + 'of length <i>L</i> links that pin to the <b>slider</b>, which is constrained between parallel '
+        + 'guide rails. At θ = 0° (Top Dead Centre, <i>x</i> = <i>L</i> + <i>r</i>) and θ = 180° '
+        + '(Bottom Dead Centre, <i>x</i> = <i>L</i> − <i>r</i>), the crank and rod are collinear '
+        + 'and the slider velocity passes through zero. The total stroke is always <i>S</i> = 2<i>r</i>.',
     },
     {
-      h: 'The two numbers that decide everything',
-      p: 'The <b>stroke</b> is twice the crank radius — set by where the pin sits on the crank. The '
-        + '<b>rod length</b> changes nothing about the stroke; it changes how the slider moves '
-        + 'within it. A long rod keeps the rod angle small, so the slider follows an almost perfect '
-        + 'sine. A short rod swings wide, presses hard sideways into the rails, makes the slider '
-        + 'linger at the ends and rush the middle. Engine designers keep the rod-to-crank ratio '
-        + 'above about 3 for exactly this reason.',
+      h: 'Why the motion is not a pure sine wave',
+      p: 'Exact slider position is <i>x</i>(θ) = <i>r</i> cos θ + √(<i>L</i>² − <i>r</i>² sin² θ). '
+        + 'Because the connecting rod tilts through angle φ = arcsin((<i>r</i>/<i>L</i>) sin θ), it '
+        + 'pulls the slider slightly closer whenever sin θ ≠ 0. A shorter rod (smaller <i>L</i>/<i>r</i>) '
+        + 'increases peak acceleration at TDC and increases lateral thrust against the guide rails.',
     },
     {
-      h: 'Why it is printed as a stack',
-      p: 'Two links cannot share one plane without colliding, so the crank, the rod and the slider '
-        + 'each sit on their own level and are joined by vertical pins. The pins here are printed '
-        + 'posts on the crank and the slider, with press-on caps above the rod: the rod is captive, '
-        + 'and nothing has to be bought. The axle is a printed post on the base plate too — this '
-        + 'machine needs no hardware at all.',
+      h: 'Three-tier non-colliding z-stack',
+      p: 'For the crank to spin a full 360°, the connecting rod must sweep directly over the crank’s '
+        + 'central axle. Here the crank disc and slider sit on Tier 1 (<i>z</i> = 4..11.6 mm), the '
+        + 'axle cap sits at <i>z</i> = 11.6..14.6 mm, and the crank pin and slider wrist pin rise to '
+        + 'carry the connecting rod on Tier 2 (<i>z</i> = 15..22.6 mm) — completely clearing the axle cap.',
     },
     {
-      h: 'Where you meet it',
-      p: 'Steam engines, petrol engines, air compressors, bicycle pedals, sewing-machine needles and '
-        + 'foot pumps are all this mechanism. Run it backwards — push the slider — and it becomes '
-        + 'the pump or the engine: linear force in, rotation out.',
+      h: 'Reversible kinematics: pump vs engine',
+      p: 'Drive the crank with a gearmotor and you have a reciprocating pump, compressor or punch. '
+        + 'Push the slider with steam, combustion gas or a pneumatic cylinder and it drives the crank — '
+        + 'providing a flywheel carries it past the two dead-centre singularities.',
     },
   ],
   references: [
-    { label: '507 Mechanical Movements — cranks (92, 93, 98)', url: 'https://507movements.com/toc.html' },
-    { label: 'Slider-crank linkage — Wikipedia', url: 'https://en.wikipedia.org/wiki/Slider-crank_linkage' },
+    { label: '507 Mechanical Movements — Slider-crank (#92)', url: 'https://507movements.com/mm_092.html' },
+    { label: 'Slider-crank linkage equations — Wikipedia', url: 'https://en.wikipedia.org/wiki/Slider-crank_linkage' },
   ],
-  attribution: 'Crank and slider — from the mechanisms catalogue. This print pack is generated from the same model the page runs.',
-  screenshot: { t: 118 },
+  attribution: 'Crank and slider — 3-tier non-colliding stack with integral guide rails and 5 mm stroke ruler.',
+  screenshot: { t: 118, azimuth: -0.58, elevation: 0.74 },
+  order: 30,
 };
 
 export const params = [
   { key: 'stroke', label: 'Stroke', min: 18, max: 60, step: 2, value: 34, unit: 'mm',
-    help: 'Twice the crank radius: how far the slider travels.' },
+    help: 'Twice the crank pin radius r: total distance between dead centres.' },
   { key: 'rod', label: 'Rod length', min: 44, max: 116, step: 2, value: 80, unit: 'mm',
-    help: 'Centre to centre. Longer rods make the slider’s motion smoother.' },
+    help: 'Centre-to-centre connecting rod length. Higher L/r reduces rail side-load.' },
   { key: 'clearance', label: 'Bore clearance', min: 0.2, max: 0.5, step: 0.05, value: 0.3, unit: 'mm',
-    help: 'Added to every turning bore. Raise it if your printer runs tight.' },
+    help: 'Diametral running clearance on all pivot bores.' },
 ];
 
 export const hardware = [];
 
-/* ---------------------------------------------------------------- geometry */
-
-const POST_R = 3.4;          // every pivot post is Ø6.8
+const POST_R = 3.4;
 const CAP_T = 3;
-const SLIDE_L = 34;
-const SLIDE_W = 30;
-const RAIL_W = 5;
+const SLIDE_L = 32;
+const SLIDE_W = 28;
+const RAIL_W = 5.2;
 const PLATE_T = KIT.plateT;
 
-const crankDiscR = (stroke) => Math.max(19, stroke / 2 + 11);
+const crankDiscR = (stroke) => Math.max(19, stroke / 2 + 10.5);
 
 function geom(p) {
   const r = p.stroke / 2;
   const L = p.rod;
-  const turn = POST_R * 2 + p.clearance;      // running bore on a post
-  const press = POST_R * 2 - 0.3;             // cap bore: press fit on a post
+  const turn = POST_R * 2 + p.clearance;
+  const press = POST_R * 2 - 0.3;
   const capR = POST_R + 3.2;
 
-  const rodZ = PLATE_T + 10;                  // layer 1 floor, clear of the axle cap
+  const crankTop = PLATE_T + KIT.hubT + KIT.bodyT; // 11.6 mm
+  const axleCapTop = crankTop + CAP_T;             // 14.6 mm
+  const rodZ = axleCapTop + 0.5;                   // 15.1 mm (clears axle cap!)
   const rodBot = rodZ + KIT.hubT;
-  const rodTop = rodBot + KIT.bodyT;
-  const capTop = rodTop + CAP_T;
+  const rodTop = rodBot + KIT.bodyT;               // 22.7 mm
+  const capTop = rodTop + CAP_T;                   // 25.7 mm
 
   const discR = crankDiscR(p.stroke);
-  const railFrom = Math.max(L - r - SLIDE_L / 2 - 6, discR + 3);
+  const railFrom = Math.max(L - r - SLIDE_L / 2 - 6, discR + 4);
   const railTo = L + r + SLIDE_L / 2 + 10;
-  const xMin = -(discR + 22);
+  const xMin = -(discR + 18);
   const xMax = L + r + SLIDE_L / 2 + 18;
-  const plateD = 98;
+  const plateD = 96;
 
   const sliderX = (deg) => {
     const th = deg * D;
@@ -111,7 +110,7 @@ function geom(p) {
   };
 
   return {
-    r, L, turn, press, capR, rodZ, rodBot, rodTop, capTop, discR,
+    r, L, turn, press, capR, crankTop, axleCapTop, rodZ, rodBot, rodTop, capTop, discR,
     railFrom, railTo, xMin, xMax, plateD, plateW: xMax - xMin, sliderX,
     railGap: SLIDE_W / 2 + 0.35,
   };
@@ -120,55 +119,58 @@ function geom(p) {
 export function build(p) {
   const g = geom(p);
   const {
-    r, L, turn, press, capR, rodZ, rodTop, capTop, discR,
+    r, L, turn, press, capR, crankTop, rodZ, rodTop, discR,
     railFrom, railTo, xMin, xMax, plateW, plateD, railGap,
   } = g;
 
-  /* -- base frame: plate, rails, axle post ------------------------------ */
-
   const mountHoles = [
-    [xMin + 13, -plateD / 2 + 13], [xMax - 13, -plateD / 2 + 13],
-    [xMin + 13, plateD / 2 - 13], [xMax - 13, plateD / 2 - 13],
+    [xMin + 12, -plateD / 2 + 12], [xMax - 12, -plateD / 2 + 12],
+    [xMin + 12, plateD / 2 - 12], [xMax - 12, plateD / 2 - 12],
   ].map(([x, y]) => circle(x, y, 1.8, 20));
 
-  // ruler ticks punched right through the plate along the front edge
   const ticks = [];
-  for (let i = 0; i * 5 <= plateW - 34; i++) {
-    const major = i % 5 === 0;
-    ticks.push(rect(xMin + 16 + i * 5 - 0.55, -plateD / 2 + 1.4, 1.1, major ? 4.4 : 2.6));
+  for (let x = Math.ceil(railFrom / 5) * 5; x <= railTo - 4; x += 5) {
+    const major = x % 20 === 0;
+    ticks.push(rect(x - 0.55, -plateD / 2 + 3, 1.1, major ? 4.8 : 2.8));
   }
 
   const frame = part({
     id: 'frame',
     name: 'Base frame',
-    color: '#d9d0c1',
+    color: '#ece6da',
     role: 'frame',
-    note: 'plate, two guide rails, the axle post and a 5 mm ruler, in one print',
+    explosion: [0, 0, 0],
+    note: 'plate with parallel piston guide rails, crank axle post and 5 mm stroke scale',
     solids: [
       slab({
-        outer: roundedRect({ x: xMin, y: -plateD / 2, w: plateW, h: plateD, r: 5, n: 6 }),
+        outer: roundedRect({ x: xMin, y: -plateD / 2, w: plateW, h: plateD, r: 6, n: 6 }),
         holes: [...mountHoles, ...ticks],
         z: 0,
         h: PLATE_T,
       }),
       ...[-1, 1].map((s) => slab({
-        outer: rect(railFrom, s === 1 ? railGap : -railGap - RAIL_W, railTo - railFrom, RAIL_W),
+        outer: roundedRect({
+          x: railFrom,
+          y: s === 1 ? railGap : -railGap - RAIL_W,
+          w: railTo - railFrom,
+          h: RAIL_W,
+          r: 1.5,
+          n: 3,
+        }),
         z: PLATE_T,
-        h: 6.4,
+        h: KIT.hubT + KIT.bodyT,
       })),
-      slab({ outer: circle(0, 0, POST_R, 36), z: PLATE_T, h: 7.6 }), // axle post
+      slab({ outer: circle(0, 0, POST_R, 36), z: PLATE_T, h: crankTop - PLATE_T + 1.8 }),
     ],
   });
 
-  /* -- crank ------------------------------------------------------------- */
-
   const webHoles = [];
-  const webR = discR - 7;
+  const webR = discR - 7.5;
   for (let i = 0; i < 3; i++) {
-    const a = (40 + i * 120) * D;
-    const holeR = Math.max(2.4, discR * 0.095);
+    const a = (60 + i * 120) * D;
+    const holeR = Math.max(2.2, discR * 0.09);
     const cx = webR * Math.cos(a), cy = webR * Math.sin(a);
-    if (Math.hypot(cx - r, cy) > holeR + POST_R + 1.6 && Math.hypot(cx, cy) > holeR + turn / 2 + 2.6) {
+    if (Math.hypot(cx - r, cy) > holeR + POST_R + 2.2 && Math.hypot(cx, cy) > holeR + turn / 2 + 2.8) {
       webHoles.push(circle(cx, cy, holeR, 20));
     }
   }
@@ -176,9 +178,10 @@ export function build(p) {
   const crank = part({
     id: 'crank',
     name: 'Crank disc',
-    color: '#cf6a34',
-    layer: 0,
-    note: `pin at ${r.toFixed(1)} mm — the stroke is twice this`,
+    color: '#dcb038',
+    layer: 1,
+    explosion: [0, 0, 18],
+    note: `eccentric crank pin at r = ${r.toFixed(1)} mm (stroke = 2r = ${p.stroke} mm)`,
     at: { x: 0, y: 0, z: PLATE_T },
     solids: [
       slab({ outer: circle(0, 0, 10, 40), holes: [circle(0, 0, turn / 2, 40)], z: 0, h: KIT.hubT }),
@@ -191,83 +194,109 @@ export function build(p) {
       slab({
         outer: circle(r, 0, POST_R, 32),
         z: KIT.hubT + KIT.bodyT,
-        h: (capTop - PLATE_T) - KIT.hubT - KIT.bodyT,
+        h: (rodTop - PLATE_T) - KIT.hubT - KIT.bodyT + 1.8,
       }),
     ],
   });
 
-  /* -- connecting rod ---------------------------------------------------- */
-
   const conrod = part({
     id: 'conrod',
     name: 'Connecting rod',
-    color: '#6c7d8b',
-    layer: 1,
-    note: `centre-to-centre ${L} mm — L/r = ${(L / r).toFixed(2)}`,
+    color: '#5aa2d4',
+    layer: 2,
+    explosion: [0, 0, 38],
+    note: `centre-to-centre L = ${L} mm — ratio L/r = ${(L / r).toFixed(2)}`,
     at: { x: 0, y: 0, z: rodZ },
     solids: [
-      slab({ outer: circle(0, 0, 10.4, 40), holes: [circle(0, 0, turn / 2, 40)], z: 0, h: KIT.hubT }),
+      slab({ outer: circle(0, 0, 6.8, 32), holes: [circle(0, 0, turn / 2, 32)], z: 0, h: KIT.hubT }),
+      slab({ outer: circle(L, 0, 6.8, 32), holes: [circle(L, 0, turn / 2, 32)], z: 0, h: KIT.hubT }),
       slab({
-        outer: capsule(0, 0, L, 0, 6.4, 20),
-        holes: [circle(0, 0, turn / 2, 40), circle(L, 0, turn / 2, 40)],
+        outer: capsule(0, 0, L, 0, 6.8, 20),
+        holes: [circle(0, 0, turn / 2, 32), circle(L, 0, turn / 2, 32)],
         z: KIT.hubT,
         h: KIT.bodyT,
       }),
     ],
   });
 
-  /* -- slider ------------------------------------------------------------ */
-
   const slider = part({
     id: 'slider',
-    name: 'Slider',
-    color: '#b08b4a',
-    layer: 0,
-    note: 'trapped between the rails, so it can only slide',
+    name: 'Piston slider',
+    color: '#82c0e4',
+    layer: 1,
+    explosion: [0, 0, 18],
+    note: 'guided block constrained to 1D linear translation along +x',
     at: { x: 0, y: 0, z: PLATE_T },
     solids: [
       slab({
-        outer: roundedRect({ x: -SLIDE_L / 2, y: -SLIDE_W / 2, w: SLIDE_L, h: SLIDE_W, r: 3, n: 5 }),
-        holes: [slot(-13, 0, -9, 0, 4.6), slot(9, 0, 13, 0, 4.6)],
+        outer: roundedRect({ x: -SLIDE_L / 2, y: -SLIDE_W / 2, w: SLIDE_L, h: SLIDE_W, r: 3.5, n: 5 }),
+        holes: [slot(-11, -7, -7, -7, 3.8), slot(7, -7, 11, -7, 3.8), slot(-11, 7, -7, 7, 3.8), slot(7, 7, 11, 7, 3.8)],
         z: 0,
-        h: KIT.bodyT,
+        h: KIT.hubT + KIT.bodyT,
       }),
-      slab({ outer: circle(0, 0, POST_R, 32), z: KIT.bodyT, h: (capTop - PLATE_T) - KIT.bodyT }),
+      slab({
+        outer: circle(0, 0, POST_R, 32),
+        z: KIT.hubT + KIT.bodyT,
+        h: (rodTop - PLATE_T) - (KIT.hubT + KIT.bodyT) + 1.8,
+      }),
     ],
   });
 
-  /* -- caps: one print, three places ------------------------------------- */
-
   const capSolids = [slab({
-    outer: circle(0, 0, capR, 44),
-    holes: [circle(0, 0, press / 2, 44)],
+    outer: circle(0, 0, capR, 40),
+    holes: [circle(0, 0, press / 2, 40)],
     z: 0,
     h: CAP_T,
   })];
 
   const caps = [
-    part({ id: 'cap-axle', printId: 'cap', name: 'Press cap', qty: 3, color: '#e7dfd0', layer: 2,
-      note: 'press onto a post above a link; print three',
-      at: { x: 0, y: 0, z: PLATE_T + 7.6 }, solids: capSolids }),
-    part({ id: 'cap-crank', printId: 'cap', name: 'Press cap', qty: 3, color: '#e7dfd0', layer: 2,
-      at: { x: r, y: 0, z: rodTop }, solids: capSolids }),
-    part({ id: 'cap-slider', printId: 'cap', name: 'Press cap', qty: 3, color: '#e7dfd0', layer: 2,
-      at: { x: 0, y: 0, z: rodTop }, solids: capSolids }),
+    part({
+      id: 'cap-axle',
+      printId: 'cap',
+      name: 'Press cap',
+      qty: 3,
+      color: '#e7dfd0',
+      layer: 1,
+      explosion: [0, 0, 28],
+      note: 'retains crank on axle; sits below connecting rod plane',
+      at: { x: 0, y: 0, z: crankTop },
+      solids: capSolids,
+    }),
+    part({
+      id: 'cap-crank',
+      printId: 'cap',
+      name: 'Crank pin cap',
+      qty: 3,
+      color: '#e7dfd0',
+      layer: 3,
+      explosion: [0, 0, 54],
+      at: { x: 0, y: 0, z: rodTop },
+      solids: capSolids,
+    }),
+    part({
+      id: 'cap-slider',
+      printId: 'cap',
+      name: 'Wrist pin cap',
+      qty: 3,
+      color: '#e7dfd0',
+      layer: 3,
+      explosion: [0, 0, 54],
+      at: { x: 0, y: 0, z: rodTop },
+      solids: capSolids,
+    }),
   ];
-
-  /* -- checks ------------------------------------------------------------ */
 
   const travel = g.sliderX(0) - g.sliderX(180);
+  const maxPhi = (Math.asin(Math.min(0.98, r / L)) * 180) / Math.PI;
   const checks = [
-    { ok: L / r >= 2.2, text: `Rod ratio L/r = ${(L / r).toFixed(2)} — 2 or more keeps the side load on the rails low.` },
-    { ok: railFrom >= discR + 2 || railFrom > L - r - SLIDE_L / 2 - 1,
-      text: `Rails start at ${railFrom.toFixed(0)} mm, clear of the ${discR} mm crank disc.` },
-    { ok: Math.abs(travel - p.stroke) < 0.01, text: `Slider travel ${travel.toFixed(1)} mm = 2r, as it must be.` },
-    { ok: plateW <= 220 && plateD <= 220, text: `Frame ${plateW.toFixed(0)} × ${plateD} mm — fits a 220 mm bed.` },
-    { ok: r >= POST_R + 6, text: `Crank pin has ${(discR - r).toFixed(1)} mm of material around it.` },
+    { ok: L / r >= 2.2, text: `Rod ratio L/r = ${(L / r).toFixed(2)} — peak connecting rod obliquity φ_max = ${maxPhi.toFixed(1)}°.` },
+    { ok: railFrom >= discR + 2, text: `Guide rails start at x = ${railFrom.toFixed(0)} mm, clearing the Ø${(discR * 2).toFixed(0)} mm crank disc.` },
+    { ok: Math.abs(travel - p.stroke) < 0.01, text: `Exact stroke between TDC and BDC = ${travel.toFixed(1)} mm = 2r.` },
+    { ok: plateW <= 220 && plateD <= 220, text: `Baseplate ${plateW.toFixed(0)} × ${plateD} mm fits a 220 mm print bed.` },
+    { ok: r >= POST_R + 4.5, text: `Crank pin clears central axle cap; connecting rod sweeps 360° unimpeded.` },
   ];
 
-  return { parts: [...caps, frame, crank, conrod, slider], checks, g };
+  return { parts: [frame, crank, slider, conrod, ...caps], checks, g };
 }
 
 /* ------------------------------------------------------------------ motion */
@@ -298,66 +327,49 @@ export function readouts(p, t = 0) {
   const pinX = g.r * Math.cos(th);
   const pinY = g.r * Math.sin(th);
   const phi = Math.atan2(-pinY, x - pinX) / D;
-  // dx/dθ: how far the slider moves per radian of crank angle
   const slide = -g.r * Math.sin(th)
     * (1 + (g.r * Math.cos(th)) / Math.sqrt(g.L * g.L - (g.r * Math.sin(th)) ** 2));
 
   return [
-    { label: 'Shaft', value: Math.round(((t % 360) + 360) % 360), unit: '°' },
-    { label: 'Slider', value: x.toFixed(1), unit: 'mm' },
-    { label: 'Rod angle', value: phi.toFixed(1), unit: '°' },
-    { label: 'Slide rate', value: slide.toFixed(2), unit: 'mm/rad' },
-    { label: 'L/r', value: (g.L / g.r).toFixed(2) },
+    { label: 'Crank θ', value: Math.round(((t % 360) + 360) % 360), unit: '°' },
+    { label: 'Slider x', value: x.toFixed(1), unit: 'mm' },
+    { label: 'Rod φ', value: phi.toFixed(1), unit: '°' },
+    { label: 'dx / dθ', value: slide.toFixed(2), unit: 'mm/rad' },
+    { label: 'Ratio L/r', value: (g.L / g.r).toFixed(2) },
   ];
 }
 
 export const steps = [
   {
-    title: 'The crank pin at full extension',
-    text: 'With the crank pointing away from the slider the pin is at its furthest, and the slider sits at the end of its stroke.',
+    title: 'Top Dead Centre (0°): maximum extension',
+    text: 'At θ = 0°, the crank pin and connecting rod line up straight along +x at x = L + r. Instantaneous slider velocity is zero while acceleration is at its peak.',
     t: 0,
     parts: ['crank', 'conrod', 'slider'],
   },
   {
-    title: 'A quarter turn: half the motion is sideways',
-    text: 'The pin now moves mostly across the rails, not along them. The slider is at its fastest here. Watch the rod angle — this is the side load the rails have to take.',
+    title: 'Quarter turn (90°): peak velocity & side thrust',
+    text: 'At θ = 90°, the crank pin moves parallel to the rails and the connecting rod reaches its steepest tilt angle φ = arcsin(r/L), pressing sideways against the guide rails.',
     t: 90,
-    parts: ['conrod', 'slider'],
+    parts: ['conrod', 'slider', 'frame'],
   },
   {
-    title: 'Half a turn: the near end',
-    text: 'The pin has come back past the axle, so the slider is as close as it gets. The distance between these two extremes is exactly twice the crank radius.',
+    title: 'Bottom Dead Centre (180°): full retraction',
+    text: 'At θ = 180°, the crank pin passes behind the axle as the connecting rod bridges cleanly over the flush axle cap. The slider reaches x = L − r, completing a stroke of 2r.',
     t: 180,
-    parts: ['crank', 'slider'],
+    parts: ['crank', 'conrod', 'slider'],
   },
   {
-    title: 'A short rod swings wide',
-    text: 'Shorten the rod and the same crank makes the rod lurch. The slider hesitates at the ends and races the middle, and the rails feel a much bigger sideways push.',
-    t: 70,
-    parts: ['conrod'],
-    set: { rod: 52 },
-  },
-  {
-    title: 'A long rod is almost a sine',
-    text: 'Lengthen it and the rod barely moves off the axis. The slider’s speed becomes almost perfectly sinusoidal, which is why real engines use long rods.',
-    t: 70,
+    title: 'Short rod (L/r ≈ 2.4): high angularity',
+    text: 'Shorten the rod to 48 mm with a 40 mm stroke. Watch the steep connecting-rod angle φ and notice how the slider dwells longer near BDC and snaps faster through TDC.',
+    t: 75,
     parts: ['conrod', 'slider'],
-    set: { rod: 108 },
+    set: { stroke: 40, rod: 48 },
+  },
+  {
+    title: 'Long rod (L/r > 4): pure harmonic approximation',
+    text: 'Lengthen the rod to 108 mm. The rod stays nearly horizontal throughout the cycle, minimizing guide friction and approaching pure sinusoidal harmonic motion.',
+    t: 75,
+    parts: ['conrod', 'slider'],
+    set: { stroke: 30, rod: 108 },
   },
 ];
-
-/* ------------------------------------------------------------------ helpers */
-
-function capsule(x1, y1, x2, y2, r, n = 16) {
-  const a = Math.atan2(y2 - y1, x2 - x1);
-  const out = [];
-  for (let i = 0; i <= n; i++) {
-    const t = a - Math.PI / 2 + (i / n) * Math.PI;
-    out.push([x2 + r * Math.cos(t), y2 + r * Math.sin(t)]);
-  }
-  for (let i = 0; i <= n; i++) {
-    const t = a + Math.PI / 2 + (i / n) * Math.PI;
-    out.push([x1 + r * Math.cos(t), y1 + r * Math.sin(t)]);
-  }
-  return out;
-}

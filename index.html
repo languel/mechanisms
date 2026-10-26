@@ -3,239 +3,386 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mechanisms — motion you can print</title>
-<meta name="description" content="A catalogue of simple motion mechanisms: each one explained, animated in 3D, and printable, with its own parametric STL export.">
-<meta name="color-scheme" content="light">
+<title>Motion Mechanisms · Kinematics &amp; Actuators</title>
+<meta name="description" content="Interactive 3D and patent-line technical workbenches for motion mechanisms and motors (DC, Stepper, Servo, Gearmotor) with parametric STL and laser-cut SVG export.">
+<meta name="color-scheme" content="light dark">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
 <link rel="stylesheet" href="assets/css/site.css">
+<script defer src="assets/vendor/katex/katex.min.js"></script>
+<script defer src="assets/vendor/katex/contrib/auto-render.min.js"></script>
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="index.html"><b>Mechanisms</b> <span>— motion you can print</span></a>
+    <a class="brand" href="index.html"><b>Motion Mechanisms</b></a>
     <nav>
-      <a href="index.html" aria-current="page">Catalogue</a>
-      <a href="docs/print-standard.html">Print standard</a>
-      <a href="docs/design-notes.html">Design notes</a>
+      <a href="#mechanisms" class="nav-link" aria-current="page">Mechanisms</a>
+      <a href="#motors" class="nav-link">Motors</a>
+      <a href="#fabrication" class="nav-link">Fabrication</a>
+      <button class="theme-mode-btn" id="theme-mode-btn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
     </nav>
   </div>
 </header>
 
-<section class="hero">
-  <div class="wrap">
+<main class="wrap" style="padding-top:14px">
+  <div class="grid-head" id="mechanisms" style="padding-top:8px">
     <div>
-      <div class="kicker">Interactive · parametric · 3D printable</div>
-      <h1>Every mechanism here is one page, one working model, one print pack.</h1>
-      <p class="lede">
-        Move the parts, change the numbers, watch what the mechanism does — then download the
-        exact geometry you were looking at. Each machine is drawn, simulated and exported from a
-        single model, in millimetres, flat on the bed, with no supports.
-      </p>
+      <h2 style="font-size:24px;margin:0">Mechanisms</h2>
+      <p style="margin-top:2px"><span id="count">10</span> kinematic mechanisms · 78 printable parts</p>
     </div>
-    <aside>
-      <p><b>Start with the interaction.</b> Drag to orbit, move the slider, pick a part. The numbers
-        in the corner come from the same model that moves the parts.</p>
-      <p><b>Then print it.</b> The print pack holds one STL per part, the parameter sheet, the
-        hardware list and the mass estimate. Change a parameter and the pack changes with it.</p>
-    </aside>
-  </div>
-</section>
-
-<main class="wrap">
-  <div class="grid-head">
-    <h2>The catalogue</h2>
-    <p><span id="count">7</span> mechanisms · 35 printed parts · 1009 g of PLA in total</p>
-    <div class="filters" id="filters">
+    <div style="grid-column:1 / -1;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px">
+      <div class="filters" id="filters">
         <button class="chip" type="button" data-filter="All" aria-pressed="true">All</button>
-        <button class="chip" type="button" data-filter="Physical computing" aria-pressed="false">Physical computing</button>
-        <button class="chip" type="button" data-filter="Rotary → timed lift" aria-pressed="false">Rotary → timed lift</button>
-        <button class="chip" type="button" data-filter="Rotary ↔ linear" aria-pressed="false">Rotary ↔ linear</button>
         <button class="chip" type="button" data-filter="Rotary → rotary" aria-pressed="false">Rotary → rotary</button>
+        <button class="chip" type="button" data-filter="Rotary ↔ linear" aria-pressed="false">Rotary ↔ linear</button>
+        <button class="chip" type="button" data-filter="Rotary → linear" aria-pressed="false">Rotary → linear</button>
+        <button class="chip" type="button" data-filter="Rotary → timed lift" aria-pressed="false">Rotary → timed lift</button>
         <button class="chip" type="button" data-filter="Intermittent feed" aria-pressed="false">Intermittent feed</button>
         <button class="chip" type="button" data-filter="Intermittent index" aria-pressed="false">Intermittent index</button>
-        <button class="chip" type="button" data-filter="Rotary → linear" aria-pressed="false">Rotary → linear</button></div>
+        <button class="chip" type="button" data-filter="Physical computing" aria-pressed="false">Physical computing</button>
+        <button class="chip" type="button" data-filter="Motors &amp; actuators" aria-pressed="false">Motors &amp; actuators</button></div>
+      <div class="filters" role="group" aria-label="Grid drawing style">
+        <span style="font:600 10.5px/1 var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-right:4px">View:</span>
+        <button class="chip" type="button" data-grid-style="patent" aria-pressed="true">Hatched Line</button>
+        <button class="chip" type="button" data-grid-style="color" aria-pressed="false">Sky &amp; Gold Color</button>
+      </div>
+    </div>
   </div>
   <div class="cards" id="cards">
-      <a class="cardlink" href="mechanisms/servo-crank/index.html" data-category="Physical computing">
-        <img class="thumb" src="assets/img/servo-crank.svg" alt="Servo crank — assembled, in isometric view" loading="lazy" width="900" height="700">
+      <a class="cardlink" href="mechanisms/gear-pair/index.html" data-category="Rotary → rotary">
+        <div class="card-plate-head">
+          <span class="plate-no">FIG. 01</span>
+          <span class="plate-cat">Rotary → rotary</span>
+        </div>
+        <img class="thumb" src="assets/img/gear-pair.svg" data-patent-src="assets/img/gear-pair.svg" data-color-src="assets/img/gear-pair-color.svg" alt="Spur gears — technical assembly drawing" loading="lazy" width="900" height="680">
         <div class="body">
-          <h3>Servo crank</h3>
-          <p class="q">A servo sweeps 0–180°, but a crank needs a full turn. What does a servo-driven crank actually give you, and how do you choose the arm length?</p>
-          <div class="tags">
-            <span class="tag">Physical computing</span>
-            <span class="tag">5 printed parts</span>
-            <span class="tag">113 g</span>
-            <span class="tag">4 parameters</span>
-          </div>
+          <h3>Spur gears</h3>
+          <p class="desc">Transmits continuous rotation between parallel shafts with precise whole-number speed and torque ratios.</p>
         </div>
       </a>
-      <a class="cardlink" href="mechanisms/cam-follower/index.html" data-category="Rotary → timed lift">
-        <img class="thumb" src="assets/img/cam-follower.svg" alt="Cam and roller follower — assembled, in isometric view" loading="lazy" width="900" height="700">
+      <a class="cardlink" href="mechanisms/belt-pulley/index.html" data-category="Rotary → rotary">
+        <div class="card-plate-head">
+          <span class="plate-no">FIG. 02</span>
+          <span class="plate-cat">Rotary → rotary</span>
+        </div>
+        <img class="thumb" src="assets/img/belt-pulley.svg" data-patent-src="assets/img/belt-pulley.svg" data-color-src="assets/img/belt-pulley-color.svg" alt="Belt and pulley drive — technical assembly drawing" loading="lazy" width="900" height="680">
         <div class="body">
-          <h3>Cam and roller follower</h3>
-          <p class="q">How can one steady rotation make a follower rise smoothly, dwell at the top, and come back down without a jolt — and what limits how fast it can do it?</p>
-          <div class="tags">
-            <span class="tag">Rotary → timed lift</span>
-            <span class="tag">5 printed parts</span>
-            <span class="tag">172 g</span>
-            <span class="tag">6 parameters</span>
-          </div>
+          <h3>Belt and pulley drive</h3>
+          <p class="desc">Transmits smooth, quiet rotary motion across wide shaft spans with zero backlash.</p>
         </div>
       </a>
       <a class="cardlink" href="mechanisms/rack-pinion/index.html" data-category="Rotary ↔ linear">
-        <img class="thumb" src="assets/img/rack-pinion.svg" alt="Rack and pinion — assembled, in isometric view" loading="lazy" width="900" height="700">
+        <div class="card-plate-head">
+          <span class="plate-no">FIG. 03</span>
+          <span class="plate-cat">Rotary ↔ linear</span>
+        </div>
+        <img class="thumb" src="assets/img/rack-pinion.svg" data-patent-src="assets/img/rack-pinion.svg" data-color-src="assets/img/rack-pinion-color.svg" alt="Rack and pinion — technical assembly drawing" loading="lazy" width="900" height="680">
         <div class="body">
           <h3>Rack and pinion</h3>
-          <p class="q">How does a gear drive something in a straight line, and what has to match for the teeth to run smoothly into each other?</p>
-          <div class="tags">
-            <span class="tag">Rotary ↔ linear</span>
-            <span class="tag">5 printed parts</span>
-            <span class="tag">210 g</span>
-            <span class="tag">4 parameters</span>
-          </div>
-        </div>
-      </a>
-      <a class="cardlink" href="mechanisms/gear-pair/index.html" data-category="Rotary → rotary">
-        <img class="thumb" src="assets/img/gear-pair.svg" alt="Spur gears — assembled, in isometric view" loading="lazy" width="900" height="700">
-        <div class="body">
-          <h3>Spur gears</h3>
-          <p class="q">Two gears mesh. What exactly decides how much slower the second one turns, and why do their teeth have that curve?</p>
-          <div class="tags">
-            <span class="tag">Rotary → rotary</span>
-            <span class="tag">4 printed parts</span>
-            <span class="tag">148 g</span>
-            <span class="tag">4 parameters</span>
-          </div>
-        </div>
-      </a>
-      <a class="cardlink" href="mechanisms/ratchet-pawl/index.html" data-category="Intermittent feed">
-        <img class="thumb" src="assets/img/ratchet-pawl.svg" alt="Ratchet and pawl — assembled, in isometric view" loading="lazy" width="900" height="700">
-        <div class="body">
-          <h3>Ratchet and pawl</h3>
-          <p class="q">How does a back-and-forth motion become a series of equal steps in one direction — and what stops the wheel running backwards between steps?</p>
-          <div class="tags">
-            <span class="tag">Intermittent feed</span>
-            <span class="tag">7 printed parts</span>
-            <span class="tag">126 g</span>
-            <span class="tag">4 parameters</span>
-          </div>
-        </div>
-      </a>
-      <a class="cardlink" href="mechanisms/geneva-indexer/index.html" data-category="Intermittent index">
-        <img class="thumb" src="assets/img/geneva-indexer.svg" alt="Geneva indexer — assembled, in isometric view" loading="lazy" width="900" height="700">
-        <div class="body">
-          <h3>Geneva indexer</h3>
-          <p class="q">How can one continuous rotation produce motion that stops dead for most of the cycle, and what sets how hard the wheel has to accelerate to get through a step?</p>
-          <div class="tags">
-            <span class="tag">Intermittent index</span>
-            <span class="tag">4 printed parts</span>
-            <span class="tag">108 g</span>
-            <span class="tag">3 parameters</span>
-          </div>
+          <p class="desc">Converts rotary shaft motion into straight-line travel for steering racks, CNC gantries, and linear stages.</p>
         </div>
       </a>
       <a class="cardlink" href="mechanisms/crank-slider/index.html" data-category="Rotary → linear">
-        <img class="thumb" src="assets/img/crank-slider.svg" alt="Crank and slider — assembled, in isometric view" loading="lazy" width="900" height="700">
+        <div class="card-plate-head">
+          <span class="plate-no">FIG. 04</span>
+          <span class="plate-cat">Rotary → linear</span>
+        </div>
+        <img class="thumb" src="assets/img/crank-slider.svg" data-patent-src="assets/img/crank-slider.svg" data-color-src="assets/img/crank-slider-color.svg" alt="Crank and slider — technical assembly drawing" loading="lazy" width="900" height="680">
         <div class="body">
           <h3>Crank and slider</h3>
-          <p class="q">If the crank turns at a constant speed, why does the slider race through the middle of its stroke and stop dead at each end?</p>
-          <div class="tags">
-            <span class="tag">Rotary → linear</span>
-            <span class="tag">5 printed parts</span>
-            <span class="tag">131 g</span>
-            <span class="tag">3 parameters</span>
-          </div>
+          <p class="desc">Transforms continuous rotation into reciprocating linear piston motion for engines, pumps, and compressors.</p>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/scotch-yoke/index.html" data-category="Rotary ↔ linear">
+        <div class="card-plate-head">
+          <span class="plate-no">FIG. 05</span>
+          <span class="plate-cat">Rotary ↔ linear</span>
+        </div>
+        <img class="thumb" src="assets/img/scotch-yoke.svg" data-patent-src="assets/img/scotch-yoke.svg" data-color-src="assets/img/scotch-yoke-color.svg" alt="Scotch yoke — technical assembly drawing" loading="lazy" width="900" height="680">
+        <div class="body">
+          <h3>Scotch yoke</h3>
+          <p class="desc">Converts rotational motion into pure harmonic linear oscillation without angular connecting-rod distortion.</p>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/four-bar/index.html" data-category="Rotary → rotary">
+        <div class="card-plate-head">
+          <span class="plate-no">FIG. 06</span>
+          <span class="plate-cat">Rotary → rotary</span>
+        </div>
+        <img class="thumb" src="assets/img/four-bar.svg" data-patent-src="assets/img/four-bar.svg" data-color-src="assets/img/four-bar-color.svg" alt="Four-bar linkage — technical assembly drawing" loading="lazy" width="900" height="680">
+        <div class="body">
+          <h3>Four-bar linkage</h3>
+          <p class="desc">Turns continuous rotation into sweeping oscillating arcs for windshield wipers, deployable linkages, and steering geometry.</p>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/cam-follower/index.html" data-category="Rotary → timed lift">
+        <div class="card-plate-head">
+          <span class="plate-no">FIG. 07</span>
+          <span class="plate-cat">Rotary → timed lift</span>
+        </div>
+        <img class="thumb" src="assets/img/cam-follower.svg" data-patent-src="assets/img/cam-follower.svg" data-color-src="assets/img/cam-follower-color.svg" alt="Cam and roller follower — technical assembly drawing" loading="lazy" width="900" height="680">
+        <div class="body">
+          <h3>Cam and roller follower</h3>
+          <p class="desc">Translates steady rotation into custom lift, dwell, and timed motion profiles for automation and valve trains.</p>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/ratchet-pawl/index.html" data-category="Intermittent feed">
+        <div class="card-plate-head">
+          <span class="plate-no">FIG. 08</span>
+          <span class="plate-cat">Intermittent feed</span>
+        </div>
+        <img class="thumb" src="assets/img/ratchet-pawl.svg" data-patent-src="assets/img/ratchet-pawl.svg" data-color-src="assets/img/ratchet-pawl-color.svg" alt="Ratchet and pawl — technical assembly drawing" loading="lazy" width="900" height="680">
+        <div class="body">
+          <h3>Ratchet and pawl</h3>
+          <p class="desc">Allows rotation in only one direction while preventing reverse backdrive for winches, jacks, and ratchets.</p>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/geneva-indexer/index.html" data-category="Intermittent index">
+        <div class="card-plate-head">
+          <span class="plate-no">FIG. 09</span>
+          <span class="plate-cat">Intermittent index</span>
+        </div>
+        <img class="thumb" src="assets/img/geneva-indexer.svg" data-patent-src="assets/img/geneva-indexer.svg" data-color-src="assets/img/geneva-indexer-color.svg" alt="Geneva indexer — technical assembly drawing" loading="lazy" width="900" height="680">
+        <div class="body">
+          <h3>Geneva indexer</h3>
+          <p class="desc">Translates continuous rotation into discrete intermittent stepped dwells for film projectors and rotary tool changers.</p>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/servo-crank/index.html" data-category="Physical computing">
+        <div class="card-plate-head">
+          <span class="plate-no">FIG. 10</span>
+          <span class="plate-cat">Physical computing</span>
+        </div>
+        <img class="thumb" src="assets/img/servo-crank.svg" data-patent-src="assets/img/servo-crank.svg" data-color-src="assets/img/servo-crank-color.svg" alt="Servo crank — technical assembly drawing" loading="lazy" width="900" height="680">
+        <div class="body">
+          <h3>Servo crank</h3>
+          <p class="desc">Translates bounded 180° hobby servo rotation into precise linear positioning for animatronics and robotics.</p>
         </div>
       </a></div>
 
-  <section class="section" id="why">
-    <h2>Why these mechanisms first</h2>
-    <div class="cols">
+  <!-- MOTORS SECTION: Demonstrators, Comparison Table, and Key Terms Glossary -->
+  <section class="section" id="motors" style="padding-top:24px;margin-top:12px">
+    <div class="grid-head" style="padding:0 0 14px">
       <div>
-        <h3>They are the vocabulary of physical computing</h3>
-        <p>A servo horn becomes a crank, a crank becomes a slider, a slider becomes a rocker. Almost
-          every small machine you would build with a microcontroller — a plotter, a camera slider, a
-          robot leg, a feeder — is two or three of these movements joined together.</p>
-        <p>The catalogue starts with the movements you can hold in one hand, because those are the
-          ones you need to feel before a linkage diagram means anything.</p>
+        <h2 style="font-size:24px;margin:0">Motors &amp; Actuators</h2>
+        <p style="margin-top:2px">Cutaway demonstrators with live magnetic field vectors, Lorentz torque, and signal oscilloscopes</p>
       </div>
-      <div>
-        <h3>Each page is a machine, not an article</h3>
-        <p>One mechanism per page: the object, the controls, the cutaway, the numbers, and one
-          sentence that says what the whole thing is about. No diagram is decorative — every part
-          you see is a part in the STL beside it.</p>
-        <p>The breakdown is written from the model: the stroke really is twice the crank radius, the
-          rod ratio really does set the side load, the cam really does undercut when you push the
-          roller past the flank.</p>
+    </div>
+    <div class="cards" id="motor-cards">
+      <a class="cardlink" href="mechanisms/dc-motor/index.html" data-category="Motors &amp; actuators">
+        <div class="card-plate-head">
+          <span class="plate-no">ACTUATOR 01</span>
+          <span class="plate-cat">Motors &amp; actuators</span>
+        </div>
+        <img class="thumb" src="assets/img/dc-motor.svg" data-patent-src="assets/img/dc-motor.svg" data-color-src="assets/img/dc-motor-color.svg" alt="Brushed DC motor — technical assembly drawing" loading="lazy" width="900" height="680">
+        <div class="body">
+          <h3>Brushed DC motor</h3>
+          <p class="desc">High-speed continuous electric motor driven by DC voltage, for wheels, propellers, and centrifugal pumps.</p>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/stepper-motor/index.html" data-category="Motors &amp; actuators">
+        <div class="card-plate-head">
+          <span class="plate-no">ACTUATOR 02</span>
+          <span class="plate-cat">Motors &amp; actuators</span>
+        </div>
+        <img class="thumb" src="assets/img/stepper-motor.svg" data-patent-src="assets/img/stepper-motor.svg" data-color-src="assets/img/stepper-motor-color.svg" alt="Bipolar stepper motor — technical assembly drawing" loading="lazy" width="900" height="680">
+        <div class="body">
+          <h3>Bipolar stepper motor</h3>
+          <p class="desc">Provides precise open-loop discrete angular positioning in 1.8° increments for 3D printers and CNC machines.</p>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/gear-motor/index.html" data-category="Motors &amp; actuators">
+        <div class="card-plate-head">
+          <span class="plate-no">ACTUATOR 03</span>
+          <span class="plate-cat">Motors &amp; actuators</span>
+        </div>
+        <img class="thumb" src="assets/img/gear-motor.svg" data-patent-src="assets/img/gear-motor.svg" data-color-src="assets/img/gear-motor-color.svg" alt="DC gearmotor &amp; encoder — technical assembly drawing" loading="lazy" width="900" height="680">
+        <div class="body">
+          <h3>DC gearmotor &amp; encoder</h3>
+          <p class="desc">Compound spur reduction gearbox delivering high output torque with integrated quadrature encoder feedback.</p>
+        </div>
+      </a>
+      <a class="cardlink" href="mechanisms/servo-motor/index.html" data-category="Motors &amp; actuators">
+        <div class="card-plate-head">
+          <span class="plate-no">ACTUATOR 04</span>
+          <span class="plate-cat">Motors &amp; actuators</span>
+        </div>
+        <img class="thumb" src="assets/img/servo-motor.svg" data-patent-src="assets/img/servo-motor.svg" data-color-src="assets/img/servo-motor-color.svg" alt="Positional servo motor — technical assembly drawing" loading="lazy" width="900" height="680">
+        <div class="body">
+          <h3>Positional servo motor</h3>
+          <p class="desc">Closed-loop geared actuator holding exact angular positions (0–180°) via PWM pulse control.</p>
+        </div>
+      </a></div>
+
+    <!-- Unified Actuator Comparison Table -->
+    <div style="margin-top:28px">
+      <div class="kicker">Actuator Selection Guide</div>
+      <h3 style="font-size:18px;margin:0 0 10px">Comparing DC, Gearmotor, Stepper, and Hobby Servo</h3>
+      <div class="table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th><a href="mechanisms/dc-motor/index.html">Brushed DC Motor →</a></th>
+              <th><a href="mechanisms/gear-motor/index.html">DC Gearmotor &amp; Encoder →</a></th>
+              <th><a href="mechanisms/stepper-motor/index.html">Bipolar Stepper Motor →</a></th>
+              <th><a href="mechanisms/servo-motor/index.html">Positional Hobby Servo →</a></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Electromagnetic &amp; mechanical law</b></td>
+              <td>Brushes reverse coil current every 180° so Lorentz torque $\tau = N B I A \sin\theta$ stays unidirectional; back-EMF $V_{\text{bemf}} = k_e\omega$ opposes voltage.</td>
+              <td>Cascaded compound spur stages multiply ratio $G = R_1 R_2 R_3$: output speed $\omega_{\text{out}} = \omega_m / G$, torque $\tau_{\text{out}} = \eta G \tau_m$, and rear encoder resolution multiplies by $G$.</td>
+              <td>Two orthogonal stator phases $(I_A, I_B)$ rotate magnetic field $\theta_B = \text{atan2}(I_B, I_A)$ in discrete steps; rotor teeth align to minimize reluctance.</td>
+              <td>Internal comparator measures error $e = \theta_{\text{cmd}} - \theta_{\text{pot}}$ between 50 Hz pulse width and feedback potentiometer, driving an H-bridge proportionally ($V_m = K_p e$).</td>
+            </tr>
+            <tr>
+              <td><b>Native motion</b></td>
+              <td>Continuous high-speed rotation (3,000–12,000 RPM), very low torque</td>
+              <td>Continuous high-torque rotation (30–300 RPM), multi-turn closed-loop capable</td>
+              <td>Continuous or discrete stepped rotation (200 steps/rev, 1.8°/step)</td>
+              <td>Bounded angular arc (typically 0°–180°), geared down ~180:1 to ~60 RPM</td>
+            </tr>
+            <tr>
+              <td><b>Control signal</b></td>
+              <td><b>PWM duty cycle</b> (<code>analogWrite</code> 0–255) sets speed; H-bridge sets polarity</td>
+              <td><b>PWM + H-bridge</b> for drive; <b>2-channel 90° Quadrature (`CHA`/`CHB`)</b> interrupts for PID feedback</td>
+              <td><b>STEP / DIR pulses</b> — each rising edge advances one exact angular quantum</td>
+              <td><b>50 Hz pulse width</b> — <code>1000 µs</code> (−90°), <code>1500 µs</code> (0°), <code>2000 µs</code> (+90°)</td>
+            </tr>
+            <tr>
+              <td><b>Position feedback</b></td>
+              <td>Open-loop (no built-in angle sensing)</td>
+              <td><b>Incremental quadrature Hall/optical encoder</b> on fast motor tail shaft (`~360+` counts/out rev)</td>
+              <td>Open-loop detent counting (exact unless stalled past holding torque)</td>
+              <td><b>Closed-loop internal potentiometer</b> coupled to the output spline</td>
+            </tr>
+            <tr>
+              <td><b>Typical driver IC &amp; Specs</b></td>
+              <td><a href="https://www.ti.com/lit/ds/symlink/drv8833.pdf" target="_blank" rel="noopener" class="hw-spec-link">DRV8833 ↗</a>, <a href="https://toshiba.semicon-storage.com/info/TB6612FNG_datasheet_en_20141001.pdf" target="_blank" rel="noopener" class="hw-spec-link">TB6612FNG ↗</a></td>
+              <td><a href="https://toshiba.semicon-storage.com/info/TB6612FNG_datasheet_en_20141001.pdf" target="_blank" rel="noopener" class="hw-spec-link">TB6612FNG ↗</a> + Arduino `attachInterrupt()`</td>
+              <td><a href="https://www.allegromicro.com/en/products/motor-drivers/bldc-drivers/a4988" target="_blank" rel="noopener" class="hw-spec-link">A4988 ↗</a>, TMC2209 Chopper</td>
+              <td>Built-in PCB (driven directly from 1 Arduino pin + 5V rail)</td>
+            </tr>
+            <tr>
+              <td><b>Best mechanisms to pair with</b></td>
+              <td><a href="mechanisms/belt-pulley/index.html">Belt &amp; Pulley</a>, high-speed fans &amp; flywheels</td>
+              <td><a href="mechanisms/crank-slider/index.html">Crank &amp; Slider</a>, <a href="mechanisms/cam-follower/index.html">Cam &amp; Follower</a>, <a href="mechanisms/scotch-yoke/index.html">Scotch Yoke</a>, <a href="mechanisms/four-bar/index.html">Four-Bar Linkage</a></td>
+              <td><a href="mechanisms/rack-pinion/index.html">Rack &amp; Pinion</a>, <a href="mechanisms/geneva-indexer/index.html">Geneva Indexer</a>, <a href="mechanisms/ratchet-pawl/index.html">Indexing Feeds</a></td>
+              <td><a href="mechanisms/servo-crank/index.html">Servo Crank</a>, <a href="mechanisms/four-bar/index.html">Four-Bar Linkage</a>, <a href="mechanisms/crank-slider/index.html">Crank &amp; Slider</a></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <div>
-        <h3>Print packs, not just STLs</h3>
-        <p>Every page exports a ZIP: one STL per part, already flat on the bed and in millimetres;
-          a parameter sheet with the values you chose; a bill of materials with masses; and the
-          assembly order.</p>
-        <p>Repeated parts are printed once and listed with their quantity, so three identical caps
-          are one file, not three.</p>
+    </div>
+
+    <!-- Actuator Physics Glossary -->
+    <div style="margin-top:24px">
+      <div class="kicker">Physics Glossary</div>
+      <h3 style="font-size:18px;margin:0 0 4px">Key Motor Terms &amp; Formulas: RPM, Torque, Load &amp; Signals</h3>
+      <div class="terms-grid">
+        <div class="term-card">
+          <div class="term-head"><b>RPM &amp; Angular Velocity</b><code>\omega = \frac{2\pi \cdot \text{RPM}}{60}</code></div>
+          <p><b>Revolutions Per Minute</b> measures no-load shaft speed. Converted to angular velocity $\omega$ (rad/s) for physics equations. Mechanical power is $P = \tau \cdot \omega$.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Torque ($\tau$) &amp; Stall Torque</b><code>\tau = F \times r \text{ [kg}\cdot\text{cm / N}\cdot\text{m]}</code></div>
+          <p>Rotational force. <b>Stall torque</b> is maximum torque output at 0 RPM; <b>rated torque</b> is safe continuous limit before thermal overheating. $1\text{ N}\cdot\text{m} \approx 10.2\text{ kg}\cdot\text{cm}$.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Mechanical Load</b><code>\tau_{\text{load}} \text{ vs. Speed}</code></div>
+          <p>Opposing resistance torque on the output shaft. Increasing load slows the motor, lowering back-EMF so current rises to match the required torque.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Back-EMF ($V_{\text{bemf}}$)</b><code>V_{\text{bemf}} = k_e \cdot \omega</code></div>
+          <p>Generator voltage induced by spinning coils in a magnetic field that opposes supply voltage. Net driving voltage across the coil is $V_{\text{net}} = V_{\text{avg}} - V_{\text{bemf}}$.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Gear Ratio &amp; Efficiency</b><code>\tau_{\text{out}} = \eta \cdot G \cdot \tau_{\text{motor}}</code></div>
+          <p>A gearbox divides speed $\omega_{\text{out}} = \omega_m / G$ while multiplying torque by $\eta \cdot G$, where $\eta \approx 90\text{–}95\%$ per spur gear mesh.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Current &amp; Thermal Limit</b><code>I = \frac{V - V_{\text{bemf}}}{R}, P = I^2 R</code></div>
+          <p>At stall ($\omega = 0$), $V_{\text{bemf}} = 0$ so current jumps to stall current $I_{\text{stall}} = V/R_{\text{coil}}$, converting 100% of power into coil heat.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Control: PWM vs. Pulse Width</b><code>\text{PWM \% vs. 1000–2000 }\mu\text{s}</code></div>
+          <p>DC &amp; gearmotors use high-frequency PWM duty cycle to vary average voltage/speed; hobby servos read absolute 50 Hz pulse duration to command shaft position.</p>
+        </div>
+        <div class="term-card">
+          <div class="term-head"><b>Encoder Resolution (CPR)</b><code>\text{CPR} = 4 \times \text{slots} \times G</code></div>
+          <p>Quadrature encoders count all rising and falling edges of channels A &amp; B ($4\times$ decoding), giving sub-degree precision per output turn.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="section" id="standard">
-    <h2>The print standard</h2>
-    <div class="cols">
+  <!-- FABRICATION SECTION: Print Standard, Tolerances, and Laser Cutting -->
+  <section class="section" id="fabrication" style="padding-top:24px;margin-top:12px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
       <div>
-        <p>Every kit in the catalogue shares one set of dimensions, so parts from different
-          mechanisms fit each other:</p>
-        <ul>
-          <li>Base plate <code>4 mm</code>; links, gears, cams and levers <code>6 mm</code>.</li>
-          <li>One turning layer every <code>8 mm</code>, each on its own <code>1.6 mm</code> hub.</li>
-          <li>Pivots are printed posts; parts are held on by press-fit caps.</li>
-          <li><code>0.3 mm</code> running clearance on every bore, <code>0.3 mm</code> interference on
-            every press fit.</li>
-          <li>Minimum <code>2.4 mm</code> wall around a bore, <code>1.6 mm</code> web elsewhere.</li>
-        </ul>
+        <h2 style="font-size:24px;margin:0">Fabrication Standards</h2>
+        <p style="margin-top:2px">3D print tolerances, modular Z-stack, and 1:1 mm laser-cut sheet specifications</p>
       </div>
-      <div>
-        <p>Nothing in a pack needs supports, and nothing needs a screw. A kit is a plate, a few
-          links, a few caps and a printed post — plus, on some mechanisms, one bought rod.</p>
-        <p>Every STL is checked before it is written: each solid must be closed, wound outwards, and
-          free of overlaps with the other solids in the same part. The page will not publish a
-          mechanism that fails.</p>
-        <p><a href="docs/print-standard.html">Read the full standard →</a></p>
-      </div>
+      <a class="btn small" href="docs/print-standard.html">Full Print Standard &amp; Diagrams →</a>
     </div>
-  </section>
 
-  <section class="section" id="next">
-    <h2>What comes next</h2>
-    <div class="cols">
-      <div>
-        <h3>Next in the queue</h3>
-        <ul>
-          <li>Four-bar linkage — change the direction and length of a push</li>
-          <li>Bell crank — turn a pull through 90° without a cable</li>
-          <li>Spring return — the other half of every solenoid-driven mechanism</li>
-          <li>Scotch yoke — a dwell for free, at the cost of side load</li>
-          <li>Worm drive — a printed gearbox that will not back-drive</li>
-        </ul>
+    <div class="std-grid" style="margin-top:16px">
+      <div class="std-card">
+        <div class="std-head"><span>Z-STACK (`plateT = 4`, `bodyT = 6`, `layerPitch = 8`)</span><code>Z-layers</code></div>
+        <svg class="std-svg" viewBox="0 0 320 120" aria-label="Z-stack cross section">
+          <rect x="28" y="84" width="230" height="22" rx="3" fill="#eee8dc" stroke="#5b5349" stroke-width="1.4"/>
+          <text x="38" y="99" font-family="monospace" font-size="9.5" fill="#221f1b">Baseplate (plateT = 4 mm)</text>
+          <rect x="92" y="20" width="32" height="64" fill="#eee8dc" stroke="#5b5349" stroke-width="1.4"/>
+          <rect x="48" y="48" width="120" height="32" rx="3" fill="#5aa2d4" fill-opacity="0.75" stroke="#221f1b" stroke-width="1.4"/>
+          <text x="54" y="68" font-family="monospace" font-size="9.5" fill="#fff" font-weight="600">Layer 0 (bodyT = 6 mm)</text>
+          <rect x="82" y="14" width="52" height="10" rx="2" fill="#5e6873" stroke="#221f1b" stroke-width="1.3"/>
+          <text x="190" y="34" font-family="monospace" font-size="9" fill="#48423a">layerPitch = 8 mm</text>
+          <text x="190" y="50" font-family="monospace" font-size="9" fill="#386b42">2 mm axial air gap</text>
+          <text x="190" y="66" font-family="monospace" font-size="9" fill="#786f63">Cap locks top of post</text>
+        </svg>
+        <p><b>Baseplate (`4 mm`)</b> stays rigid; <b>moving bodies (`6 mm`)</b> step in <b>`8 mm`</b> vertical tiers (`layerPitch`), leaving a <b>`2 mm`</b> friction-free axial gap between stacked parts.</p>
       </div>
-      <div>
-        <h3>After that</h3>
-        <ul>
-          <li>Barrel cam and grooved cam — motion the roller cannot leave</li>
-          <li>Planetary stage — a printed gearbox for a hobby motor</li>
-          <li>Toggle clamp — the mechanism that locks itself</li>
-          <li>Bevel pair — gearing that turns a corner</li>
-          <li>Linkage explorer: drag any joint and read the coupler curve</li>
-        </ul>
+
+      <div class="std-card">
+        <div class="std-head"><span>RUNNING FIT vs. PRESS FIT (`fit = 0.30 mm`)</span><code>Tolerances</code></div>
+        <svg class="std-svg" viewBox="0 0 320 120" aria-label="Running fit vs press fit">
+          <circle cx="84" cy="60" r="38" fill="#5aa2d4" fill-opacity="0.22" stroke="#221f1b" stroke-width="1.3"/>
+          <circle cx="84" cy="60" r="24" fill="#fbf8f2" stroke="#3a3734" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <circle cx="84" cy="60" r="19" fill="#eee8dc" stroke="#221f1b" stroke-width="1.4"/>
+          <text x="84" y="63" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#221f1b">Ø6.8 post</text>
+          <text x="84" y="112" text-anchor="middle" font-family="monospace" font-size="9" fill="#3a3734">Running: +0.30 mm radial</text>
+          <rect x="176" y="36" width="118" height="44" rx="4" fill="#5e6873" fill-opacity="0.22" stroke="#221f1b" stroke-width="1.3"/>
+          <circle cx="235" cy="58" r="17" fill="#eee8dc" stroke="#386b42" stroke-width="1.5"/>
+          <text x="235" y="61" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#221f1b">-0.05 mm</text>
+          <text x="235" y="112" text-anchor="middle" font-family="monospace" font-size="9" fill="#386b42">Press cap: -0.05 mm</text>
+        </svg>
+        <p><b>Running fit (`+0.30 mm` radial)</b> allows parts to spin freely right off the bed; <b>press fit (`-0.05 mm`)</b> locks retainer caps on posts by plastic hoop stress.</p>
       </div>
-      <div>
-        <h3>How it is built</h3>
-        <p>Each mechanism is a small ES module: parameters, a <code>build()</code> that returns parts
-          in print-flat millimetres, a <code>pose()</code> that moves them, and the readouts. The page,
-          the card image and the STL export all read from that one module — no second copy of the
-          geometry anywhere.</p>
-        <p><a href="docs/design-notes.html">How the model and the export fit together →</a></p>
+
+      <div class="std-card">
+        <div class="std-head"><span>MOTOR &amp; SERVO SHAFT BORES (`shaft` param)</span><code>Coupling</code></div>
+        <svg class="std-svg" viewBox="0 0 320 120" aria-label="Motor and servo shaft bores">
+          <g transform="translate(52,54)">
+            <circle r="24" fill="#e5dfd3" stroke="#221f1b" stroke-width="1.2"/>
+            <path d="M 11 -9 A 14 14 0 1 0 11 9 Z" fill="#fbf8f2" stroke="#3a3734" stroke-width="1.6"/>
+            <text y="38" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#221f1b">NEMA 17 (5mm D)</text>
+          </g>
+          <g transform="translate(158,54)">
+            <circle r="24" fill="#e5dfd3" stroke="#221f1b" stroke-width="1.2"/>
+            <path d="M 8 -7 A 10 10 0 1 0 8 7 Z" fill="#fbf8f2" stroke="#3a3734" stroke-width="1.6"/>
+            <text y="38" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#221f1b">N20 (3mm D)</text>
+          </g>
+          <g transform="translate(264,54)">
+            <circle r="24" fill="#e5dfd3" stroke="#221f1b" stroke-width="1.2"/>
+            <circle r="13" fill="#fbf8f2" stroke="#386b42" stroke-width="1.6" stroke-dasharray="2.5 1.8"/>
+            <text y="38" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#221f1b">SG90 / MG996R</text>
+          </g>
+        </svg>
+        <p>Driver gears and cranks can print with direct bores for <a href="https://www.omc-stepperonline.com/nema-17-bipolar-1-8deg-26ncm-36-8oz-in-0-4a-12v-42x42x34mm-4-wires-17hs13-0404s" target="_blank" rel="noopener">NEMA 17 (5mm D) ↗</a>, <a href="https://www.pololu.com/category/60/micro-metal-gearmotors" target="_blank" rel="noopener">N20 (3mm D) ↗</a>, <a href="https://www.towerpro.com.tw/product/sg90-7/" target="_blank" rel="noopener">SG90 (4.8mm) ↗</a>, or <a href="https://www.towerpro.com.tw/product/mg996r/" target="_blank" rel="noopener">MG996R (5.8mm) ↗</a>.</p>
       </div>
     </div>
   </section>
@@ -243,23 +390,63 @@
 
 <footer class="site">
   <div class="wrap">
-    <span>Mechanisms — built on the anatomy craft rules: one object, real parts, true numbers.</span>
-    <span>Updated 2026-10-25</span>
+    <span>Motion Mechanisms — parametric physical computing &amp; 3D print generator.</span>
+    <span><a href="https://507movements.com/" target="_blank" rel="noopener">507 Mechanical Movements ↗</a> · <a href="docs/print-standard.html">Print standard</a> · <a href="docs/design-notes.html">Design notes</a> · Updated 2026-10-26</span>
   </div>
 </footer>
 
 <script type="module">
-  const cards = document.getElementById('cards');
+  const allCards = [...document.querySelectorAll('#cards .cardlink')];
   const buttons = [...document.querySelectorAll('[data-filter]')];
   function apply(filter) {
-    const all = [...cards.children];
-    for (const card of all) {
+    for (const card of allCards) {
       const show = filter === 'All' || card.dataset.category === filter;
       card.style.display = show ? '' : 'none';
     }
     for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.filter === filter));
   }
   for (const b of buttons) b.addEventListener('click', () => apply(b.dataset.filter));
+
+  const styleBtns = [...document.querySelectorAll('[data-grid-style]')];
+  const thumbs = [...document.querySelectorAll('img.thumb[data-patent-src]')];
+  function applyGridStyle(style) {
+    for (const img of thumbs) {
+      img.src = style === 'color' ? img.dataset.colorSrc : img.dataset.patentSrc;
+    }
+    for (const b of styleBtns) {
+      b.setAttribute('aria-pressed', String(b.dataset.gridStyle === style));
+    }
+  }
+  for (const b of styleBtns) b.addEventListener('click', () => applyGridStyle(b.dataset.gridStyle));
+
+  // Dark mode toggle
+  const themeModeBtn = document.getElementById('theme-mode-btn');
+  const savedTheme = localStorage.getItem('theme-mode') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  if (savedTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  if (themeModeBtn) {
+    themeModeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    themeModeBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      localStorage.setItem('theme-mode', isDark ? 'light' : 'dark');
+      themeModeBtn.textContent = isDark ? '🌙' : '☀️';
+    });
+  }
+
+  // KaTeX auto-render
+  window.addEventListener('DOMContentLoaded', () => {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    }
+  });
 </script>
 </body>
 </html>

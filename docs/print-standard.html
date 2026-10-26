@@ -3,124 +3,349 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The print standard · Mechanisms</title>
-<meta name="description" content="The one set of dimensions every mechanism in the catalogue shares, and the rules each exported part is checked against.">
+<title>The Illustrated Print Standard · Mechanisms</title>
+<meta name="description" content="Illustrated visual reference for every dimension, fit, shaft bore, and mesh rule shared across the printable Mechanisms &amp; Motors catalogue.">
 <meta name="color-scheme" content="light">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../assets/css/site.css">
 <style>
-  .doc { max-width: 860px; margin: 0 auto; padding: 34px 22px 70px; }
-  .doc h1 { font-size: clamp(26px, 3vw, 36px); margin-bottom: 10px; }
-  .doc h2 { font-size: 20px; margin: 34px 0 10px; }
-  .doc h3 { font-size: 15px; margin: 22px 0 6px; }
-  .doc p, .doc li { font-size: 14px; color: var(--ink-soft); }
-  .doc li { margin-bottom: 6px; }
-  .doc table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; font-size: 13px; }
-  .doc th, .doc td { text-align: left; padding: 7px 9px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
-  .doc th { font-weight: 600; color: var(--ink); background: var(--paper-deep); }
-  .doc code { font: 500 12.5px/1 var(--mono); background: var(--paper-deep); padding: 2px 5px; border-radius: 4px; }
-  .doc .lede { font-family: var(--serif); font-size: 18px; line-height: 1.5; color: var(--ink); }
-  .doc .aside { border-left: 2px solid var(--accent); padding: 2px 0 2px 14px; margin: 18px 0; }
-  .doc .figure { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin: 16px 0; font-size: 13px; color: var(--muted); }
-  .doc a { color: var(--ink); }
+  .doc { max-width: 1080px; margin: 0 auto; padding: 34px 22px 70px; }
+  .doc h1 { font-size: clamp(28px, 3.2vw, 38px); margin-bottom: 10px; }
+  .doc h2 { font-size: 22px; margin: 38px 0 12px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .doc h2:first-of-type { border-top: none; padding-top: 0; }
+  .doc h3 { font-size: 16px; margin: 0 0 6px; color: var(--ink); }
+  .doc p, .doc li { font-size: 13.8px; color: var(--ink-soft); line-height: 1.55; }
+  .doc code { font: 500 12px/1 var(--mono); background: var(--paper-deep); padding: 2px 5px; border-radius: 4px; color: var(--ink); }
+  .doc .lede { font-family: var(--serif); font-size: 18.5px; line-height: 1.48; color: var(--ink); max-width: 72ch; margin-bottom: 24px; }
+  .std-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; margin: 16px 0 24px; }
+  .std-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .std-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .std-badge { font: 600 11px/1 var(--mono); color: var(--accent); background: var(--accent-soft); padding: 4px 7px; border-radius: 5px; white-space: nowrap; }
+  .std-svg {
+    width: 100%;
+    height: 150px;
+    background: #f6f1e7;
+    border: 1px solid var(--line-soft);
+    border-radius: 7px;
+    display: block;
+  }
+  .doc .aside { border-left: 2.5px solid var(--accent); padding: 4px 0 4px 14px; margin: 18px 0; background: color-mix(in srgb, var(--card) 60%, transparent); }
 </style>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="../index.html"><b>Mechanisms</b> <span>— motion you can print</span></a>
+    <a class="brand" href="../index.html"><b>Motion Mechanisms</b></a>
     <nav>
-      <a href="../index.html">Catalogue</a>
-      <a href="print-standard.html" aria-current="page">Print standard</a>
-      <a href="design-notes.html">Design notes</a>
+      <a href="../index.html#mechanisms">Mechanisms</a>
+      <a href="../index.html#motors">Motors</a>
+      <a href="../index.html#fabrication">Fabrication</a>
+      <button class="theme-mode-btn" id="theme-mode-btn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
     </nav>
   </div>
 </header>
 
 <main class="doc">
-  <div class="crumbs" style="margin-bottom:14px"><a href="../index.html">Catalogue</a><span class="sep">/</span><span>Print standard</span></div>
-  <h1>The print standard</h1>
-  <p class="lede">Every mechanism in the catalogue is built from the same small vocabulary of
-    dimensions, so a post from one kit fits a cap from another, and anything you learn about one
-    machine applies to the next.</p>
+  <div class="kicker">FDM Mechanical Engineering Reference · Illustrated Vocabulary</div>
+  <h1>The Illustrated Print Standard</h1>
+  <p class="lede">
+    Every mechanism and motor demonstrator in this catalogue is built from one shared vocabulary of
+    dimensions, fits, shaft bores, and mesh verification rules — so a post from one kit fits a cap
+    from another, and every term below can be seen directly in the parts you print.
+  </p>
 
-  <h2>1. The stack</h2>
-  <p>Parts are designed in millimetres, print-flat: <code>z = 0</code> is the bed face and
-    <code>+z</code> is up. The assembled machine stacks the same parts along <code>+z</code>, one
-    turning layer at a time.</p>
-  <table>
-    <tr><th>Element</th><th>Dimension</th><th>Why</th></tr>
-    <tr><td>Base plate</td><td>4 mm</td><td>Stiff enough for a 200 mm plate, prints in 20 layers.</td></tr>
-    <tr><td>Links, gears, cams, levers</td><td>6 mm</td><td>Three 0.4 mm perimeters plus infill; strong in the plane.</td></tr>
-    <tr><td>Turning layer pitch</td><td>8 mm</td><td>6 mm body + 1.6 mm hub + 0.4 mm running clearance.</td></tr>
-    <tr><td>Hub (stand-off boss)</td><td>1.6 mm tall</td><td>Lifts a part off the layer below without a bought spacer.</td></tr>
-    <tr><td>Pivot post</td><td>Ø6.8 mm, printed</td><td>Strong enough in PLA; a Ø3 rod fits the same bore.</td></tr>
-    <tr><td>Press cap</td><td>Ø13.2 mm × 3 mm</td><td>Holds a link on a post; 0.3 mm interference.</td></tr>
-  </table>
+  <h2>1. The Vertical Z-Stack Vocabulary</h2>
+  <p>
+    All parts are authored in millimetres with <code>z = 0</code> as the flat printer build plate and
+    <code>+z</code> pointing up. In the assembled mechanism, rotating and sliding parts stack along
+    <code>+z</code> in standardized <b>8.0 mm turning layers</b>.
+  </p>
 
-  <h2>2. Fits</h2>
-  <table>
-    <tr><th>Fit</th><th>Nominal</th><th>Used for</th></tr>
-    <tr><td>Running</td><td>+0.30 mm on the post</td><td>Every bore that turns or slides. Adjustable per mechanism: 0.2 mm for a well-tuned printer, 0.5 mm for a loose one.</td></tr>
-    <tr><td>Press</td><td>−0.30 mm on the post</td><td>Caps, and anything meant to stay put. A drop of glue is allowed but usually unnecessary.</td></tr>
-    <tr><td>Clearance</td><td>0.35 mm per side</td><td>Where a part passes beside another: carriages between rails, racks through keepers.</td></tr>
-  </table>
+  <div class="std-grid">
+    <!-- 1. Base plate -->
+    <div class="std-card">
+      <div class="std-card-head">
+        <h3>Base plate (Frame)</h3>
+        <span class="std-badge">4.0 mm · 20 layers</span>
+      </div>
+      <svg class="std-svg" viewBox="0 0 280 140">
+        <!-- Print bed line -->
+        <line x1="20" y1="108" x2="260" y2="108" stroke="#786f63" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="255" y="122" text-anchor="end" font-size="9.5" font-family="monospace" fill="#786f63">BUILD PLATE (z = 0 mm)</text>
+        <!-- 4mm slab with corner M3 hole and ruler ticks -->
+        <rect x="44" y="76" width="176" height="32" rx="3" fill="#ece6da" stroke="#221f1b" stroke-width="1.6"/>
+        <!-- Layer lines -->
+        <line x1="44" y1="84" x2="220" y2="84" stroke="#d4cab8" stroke-width="0.8"/>
+        <line x1="44" y1="92" x2="220" y2="92" stroke="#d4cab8" stroke-width="0.8"/>
+        <line x1="44" y1="100" x2="220" y2="100" stroke="#d4cab8" stroke-width="0.8"/>
+        <!-- M3 mount bore -->
+        <rect x="58" y="76" width="14" height="32" fill="#f6f1e7" stroke="#221f1b" stroke-width="1.2" stroke-dasharray="3 2"/>
+        <text x="65" y="68" text-anchor="middle" font-size="9" font-family="monospace" fill="#48423a">Ø3.6 M3</text>
+        <!-- Integral post rising from z=4 -->
+        <rect x="136" y="34" width="28" height="42" fill="#ece6da" stroke="#221f1b" stroke-width="1.6"/>
+        <!-- Dimension callout -->
+        <line x1="232" y1="76" x2="232" y2="108" stroke="#c2571f" stroke-width="1.5"/>
+        <line x1="227" y1="76" x2="237" y2="76" stroke="#c2571f" stroke-width="1.5"/>
+        <line x1="227" y1="108" x2="237" y2="108" stroke="#c2571f" stroke-width="1.5"/>
+        <text x="240" y="95" font-size="10.5" font-family="monospace" font-weight="700" fill="#c2571f">4.0 mm</text>
+      </svg>
+      <p><b>What it is:</b> The stationary ground link (<code>frame</code>) that holds axle posts, linear guide rails, and travel scales at exact centre distances. At <code>0.20 mm</code> layer height, <code>4.0 mm</code> equals 20 solid layers — rigid across a 200 mm span without warping.</p>
+    </div>
+
+    <!-- 2. Links, gears, cams, levers -->
+    <div class="std-card">
+      <div class="std-card-head">
+        <h3>Body thickness (Gears, Cams &amp; Links)</h3>
+        <span class="std-badge">6.0 mm · 3 walls</span>
+      </div>
+      <svg class="std-svg" viewBox="0 0 280 140">
+        <!-- Cross section of a 6mm gear/link showing 3 perimeter walls (0.4mm each = 1.2mm) + gyroid/grid infill -->
+        <rect x="46" y="42" width="168" height="54" rx="3" fill="#f2dcd0" stroke="#cf5a28" stroke-width="2"/>
+        <rect x="51" y="47" width="158" height="44" rx="2" fill="none" stroke="#cf5a28" stroke-width="1.2"/>
+        <rect x="55" y="51" width="150" height="36" rx="1" fill="#fbf8f2" stroke="#cf5a28" stroke-width="1"/>
+        <!-- Infill hatch -->
+        <path d="M65,51 L95,87 M95,51 L65,87 M105,51 L135,87 M135,51 L105,87 M145,51 L175,87 M175,51 L145,87" stroke="#d4cab8" stroke-width="1.2"/>
+        <!-- Dimension -->
+        <line x1="226" y1="42" x2="226" y2="96" stroke="#c2571f" stroke-width="1.5"/>
+        <text x="234" y="73" font-size="10.5" font-family="monospace" font-weight="700" fill="#c2571f">6.0 mm</text>
+        <text x="130" y="32" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#48423a">3 × 0.4 mm PERIMETERS (1.2 mm SHELL) + 25% INFILL</text>
+        <text x="130" y="116" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#786f63">Engage full 6.0 mm face width without tipping</text>
+      </svg>
+      <p><b>What it is:</b> Every moving gear, cam, pawl, and linkage bar has a <code>6.0 mm</code> structural face thickness. Sliced with 3 perimeters on a <code>0.4 mm</code> nozzle (<code>1.2 mm</code> walls) and 25% infill, teeth and pin bosses resist shear loads cleanly.</p>
+    </div>
+
+    <!-- 3. Stand-off hub & 8mm layer pitch -->
+    <div class="std-card">
+      <div class="std-card-head">
+        <h3>Stand-off hub &amp; Turning layer pitch</h3>
+        <span class="std-badge">1.6 mm hub · 8.0 mm pitch</span>
+      </div>
+      <svg class="std-svg" viewBox="0 0 280 140">
+        <!-- Baseplate at bottom -->
+        <rect x="30" y="102" width="200" height="20" fill="#ece6da" stroke="#221f1b" stroke-width="1.4"/>
+        <!-- Post -->
+        <rect x="114" y="20" width="32" height="82" fill="#ece6da" stroke="#221f1b" stroke-width="1.4"/>
+        <!-- Hub (1.6mm) -->
+        <rect x="92" y="86" width="20" height="16" fill="#39699c" stroke="#221f1b" stroke-width="1.4"/>
+        <rect x="148" y="86" width="20" height="16" fill="#39699c" stroke="#221f1b" stroke-width="1.4"/>
+        <!-- Gear body (6.0mm) -->
+        <rect x="52" y="38" width="60" height="48" fill="#39699c" stroke="#221f1b" stroke-width="1.4"/>
+        <rect x="148" y="38" width="60" height="48" fill="#39699c" stroke="#221f1b" stroke-width="1.4"/>
+        <!-- Gap callout -->
+        <text x="68" y="97" text-anchor="middle" font-size="9" font-family="monospace" fill="#c2571f" font-weight="700">1.6 mm HUB</text>
+        <line x1="220" y1="38" x2="220" y2="102" stroke="#c2571f" stroke-width="1.5"/>
+        <text x="226" y="72" font-size="9.5" font-family="monospace" font-weight="700" fill="#c2571f">7.6 mm</text>
+        <text x="226" y="84" font-size="8.5" font-family="monospace" fill="#786f63">(8mm pitch)</text>
+      </svg>
+      <p><b>What it is:</b> Every rotating part has a <code>1.6 mm</code> raised boss (<b>hub</b>) on its underside around the bore. When placed on the baseplate, only the narrow hub touches the plate, lifting the wide gear or link face by <code>1.6 mm</code> so it spins with low friction and zero bought washers.</p>
+    </div>
+
+    <!-- 4. Pivot post & Press cap -->
+    <div class="std-card">
+      <div class="std-card-head">
+        <h3>Pivot post &amp; Snap-fit Press cap</h3>
+        <span class="std-badge">Ø6.8 mm post · Ø13.2 mm cap</span>
+      </div>
+      <svg class="std-svg" viewBox="0 0 280 140">
+        <!-- Baseplate + Ø6.8mm post -->
+        <rect x="40" y="104" width="180" height="18" fill="#ece6da" stroke="#221f1b" stroke-width="1.4"/>
+        <rect x="112" y="38" width="36" height="66" fill="#ece6da" stroke="#221f1b" stroke-width="1.5"/>
+        <text x="130" y="82" text-anchor="middle" font-size="9.5" font-family="monospace" font-weight="700" fill="#221f1b">Ø6.8 mm</text>
+        <!-- Press cap above -->
+        <rect x="90" y="16" width="23" height="18" rx="2" fill="#e7dfd0" stroke="#c2571f" stroke-width="1.6"/>
+        <rect x="147" y="16" width="23" height="18" rx="2" fill="#e7dfd0" stroke="#c2571f" stroke-width="1.6"/>
+        <line x1="113" y1="16" x2="147" y2="16" stroke="#c2571f" stroke-width="1.2" stroke-dasharray="2 2"/>
+        <text x="215" y="28" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#c2571f" font-weight="700">Cap bore Ø6.5 mm</text>
+        <text x="215" y="40" text-anchor="middle" font-size="8.5" font-family="monospace" fill="#786f63">(−0.3 mm interference)</text>
+      </svg>
+      <p><b>What it is:</b> Instead of requiring metal bolts for every joint, baseplates and cranks carry integral <code>Ø6.8 mm</code> cylindrical posts. A <code>3.0 mm</code> thick <b>press cap</b> with a <code>Ø6.5 mm</code> inner bore pushes snugly onto the tip of the post to lock the assembly axially.</p>
+    </div>
+  </div>
+
+  <h2>2. Fits, Clearances &amp; Motor Shaft Bores</h2>
+  <p>
+    FDM 3D printers slightly shrink internal holes because molten filament pulls inward around curves.
+    Each mechanism exposes a live <b>Bore clearance</b> slider (default <code>0.30 mm</code>) and a
+    <b>Motor shaft selector</b> that cuts the exact bore geometry directly into the exported STL.
+  </p>
+
+  <div class="std-grid">
+    <!-- Running Fit vs Press Fit -->
+    <div class="std-card">
+      <div class="std-card-head">
+        <h3>Running fit vs. Interference press fit</h3>
+        <span class="std-badge">+0.30 mm turn · −0.30 mm press</span>
+      </div>
+      <svg class="std-svg" viewBox="0 0 280 140">
+        <!-- Left: Running fit -->
+        <circle cx="76" cy="70" r="40" fill="#f2dcd0" stroke="#221f1b" stroke-width="1.5"/>
+        <circle cx="76" cy="70" r="24" fill="#fbf8f2" stroke="#c2571f" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <circle cx="76" cy="70" r="19" fill="#ece6da" stroke="#221f1b" stroke-width="1.5"/>
+        <text x="76" y="73" text-anchor="middle" font-size="8.5" font-family="monospace" font-weight="700">POST</text>
+        <text x="76" y="126" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#c2571f" font-weight="700">Running (+0.30 mm gap)</text>
+        <!-- Right: Press fit -->
+        <circle cx="204" cy="70" r="40" fill="#e7dfd0" stroke="#221f1b" stroke-width="1.5"/>
+        <circle cx="204" cy="70" r="19" fill="#ece6da" stroke="#221f1b" stroke-width="1.5"/>
+        <circle cx="204" cy="70" r="17.5" fill="none" stroke="#a4441f" stroke-width="1.8" stroke-dasharray="3 2"/>
+        <text x="204" y="73" text-anchor="middle" font-size="8.5" font-family="monospace" font-weight="700">LOCK</text>
+        <text x="204" y="126" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#a4441f" font-weight="700">Press (−0.30 mm grip)</text>
+      </svg>
+      <p><b>What it is:</b> A <b>running fit</b> enlarges the bore by <code>+0.30 mm</code> (<code>Ø7.10 mm</code> on a <code>Ø6.80 mm</code> post) so gears spin freely right off the bed. A <b>press fit</b> undersizes the bore by <code>−0.30 mm</code> so retainer caps grip the post by elastic hoop tension.</p>
+    </div>
+
+    <!-- Linear Rail Side Clearance -->
+    <div class="std-card">
+      <div class="std-card-head">
+        <h3>Linear guide &amp; slot clearance</h3>
+        <span class="std-badge">0.35 mm per side</span>
+      </div>
+      <svg class="std-svg" viewBox="0 0 280 140">
+        <!-- Baseplate -->
+        <rect x="26" y="96" width="228" height="18" fill="#ece6da" stroke="#221f1b" stroke-width="1.4"/>
+        <!-- Left & right rails -->
+        <rect x="44" y="48" width="26" height="48" rx="2" fill="#ece6da" stroke="#221f1b" stroke-width="1.5"/>
+        <rect x="210" y="48" width="26" height="48" rx="2" fill="#ece6da" stroke="#221f1b" stroke-width="1.5"/>
+        <!-- Sliding block -->
+        <rect x="76" y="52" width="128" height="42" rx="3" fill="#39699c" stroke="#221f1b" stroke-width="1.5"/>
+        <!-- Gap callouts -->
+        <line x1="70" y1="38" x2="76" y2="38" stroke="#c2571f" stroke-width="2"/>
+        <text x="73" y="30" text-anchor="middle" font-size="9.5" font-family="monospace" font-weight="700" fill="#c2571f">0.35 mm</text>
+        <line x1="204" y1="38" x2="210" y2="38" stroke="#c2571f" stroke-width="2"/>
+        <text x="207" y="30" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#c2571f">0.35 mm</text>
+        <text x="140" y="77" text-anchor="middle" font-size="10" font-family="monospace" fill="#fff" font-weight="700">SLIDER / RACK / YOKE</text>
+      </svg>
+      <p><b>What it is:</b> Wherever a linear rack, piston slider, cam follower stem, or Scotch yoke glides between parallel guide rails, a <code>0.35 mm</code> gap per side prevents elephant-foot or corner bulge from binding the stroke.</p>
+    </div>
+
+    <!-- Motor D-Shafts & Servo Splines -->
+    <div class="std-card">
+      <div class="std-card-head">
+        <h3>Motor D-shafts &amp; Servo spline bores</h3>
+        <span class="std-badge">NEMA 17 · N20 · SG90 · MG996R</span>
+      </div>
+      <svg class="std-svg" viewBox="0 0 280 140">
+        <!-- 5mm D-shaft -->
+        <g transform="translate(55, 66)">
+          <circle cx="0" cy="0" r="32" fill="#cf5a28" opacity="0.2" stroke="#cf5a28" stroke-width="1.4"/>
+          <path d="M 14 -18 A 22.8 22.8 0 1 0 14 18 Z" fill="#fbf8f2" stroke="#221f1b" stroke-width="1.8"/>
+          <line x1="14" y1="-18" x2="14" y2="18" stroke="#c2571f" stroke-width="2.5"/>
+          <text x="0" y="48" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="#221f1b">5 mm / 3 mm D-Shaft</text>
+          <text x="0" y="59" text-anchor="middle" font-size="8" font-family="monospace" fill="#786f63">NEMA 17 &amp; N20 flat</text>
+        </g>
+        <!-- Servo spline -->
+        <g transform="translate(195, 66)">
+          <circle cx="0" cy="0" r="32" fill="#39699c" opacity="0.2" stroke="#39699c" stroke-width="1.4"/>
+          <circle cx="0" cy="0" r="20" fill="#fbf8f2" stroke="#221f1b" stroke-width="1.8" stroke-dasharray="3.5 1.8"/>
+          <circle cx="0" cy="0" r="7" fill="#e5ddd0" stroke="#48423a" stroke-width="1"/>
+          <text x="0" y="48" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="#221f1b">21T / 25T Spline</text>
+          <text x="0" y="59" text-anchor="middle" font-size="8" font-family="monospace" fill="#786f63">SG90 (4.8) &amp; MG996R (5.8)</text>
+        </g>
+      </svg>
+      <p><b>What it is:</b> Round motor shafts slip under torque. Selecting <b>NEMA 17 (5 mm D-shaft)</b> or <b>N20 (3 mm D-shaft)</b> on any gear or crank page cuts an internal flat face that locks rotation positively; selecting <b>SG90</b> or <b>MG996R</b> sizes the bore for hobby servo splines.</p>
+    </div>
+  </div>
+
+  <h2>3. Gear Tooth Geometry &amp; Mesh Verification Rules</h2>
+  <p>
+    Every STL exported by this workbench is generated from exact 2D mathematical profiles and verified by an
+    automated topological mesh audit before download.
+  </p>
+
+  <div class="std-grid">
+    <!-- Gear Module & Pressure Angle -->
+    <div class="std-card">
+      <div class="std-card-head">
+        <h3>Module (m = d / z) &amp; 20° Pressure Angle</h3>
+        <span class="std-badge">m = 1.5–3.0 mm · α = 20°</span>
+      </div>
+      <svg class="std-svg" viewBox="0 0 280 140">
+        <!-- Two teeth + pitch circle + addendum + dedendum -->
+        <path d="M 30 105 L 52 105 L 66 36 L 94 36 L 108 105 L 146 105 L 160 36 L 188 36 L 202 105 L 228 105" fill="#f2dcd0" stroke="#221f1b" stroke-width="1.8"/>
+        <!-- Pitch line -->
+        <line x1="20" y1="68" x2="260" y2="68" stroke="#c2571f" stroke-width="1.6" stroke-dasharray="5 3"/>
+        <text x="256" y="63" text-anchor="end" font-size="9" font-family="monospace" font-weight="700" fill="#c2571f">PITCH CIRCLE (d = m·z)</text>
+        <!-- Addendum & Dedendum lines -->
+        <line x1="20" y1="36" x2="260" y2="36" stroke="#39699c" stroke-width="1" stroke-dasharray="2 3"/>
+        <text x="256" y="31" text-anchor="end" font-size="8.5" font-family="monospace" fill="#39699c">Addendum (+1.0 m)</text>
+        <line x1="20" y1="105" x2="260" y2="105" stroke="#786f63" stroke-width="1" stroke-dasharray="2 3"/>
+        <text x="256" y="118" text-anchor="end" font-size="8.5" font-family="monospace" fill="#786f63">Dedendum (−1.25 m)</text>
+        <!-- Circular pitch -->
+        <line x1="80" y1="22" x2="174" y2="22" stroke="#221f1b" stroke-width="1.3"/>
+        <text x="127" y="16" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700">Circular pitch p = π · m</text>
+      </svg>
+      <p><b>What it is:</b> The <b>module</b> <code>m</code> sets tooth size: pitch diameter is <code>d = m · z</code> and centre distance is <code>C = m(z₁ + z₂)/2</code>. All gears use a standard <b>20° pressure angle</b> with <code>0.20 mm</code> backlash thinning so printed teeth roll without binding.</p>
+    </div>
+
+    <!-- Watertight Manifold & Outward Normals -->
+    <div class="std-card">
+      <div class="std-card-head">
+        <h3>Watertight manifold &amp; Outward winding</h3>
+        <span class="std-badge">Euler e₊ = e₋ · V &gt; 0</span>
+      </div>
+      <svg class="std-svg" viewBox="0 0 280 140">
+        <!-- Paired half-edges diagram -->
+        <polygon points="50,105 130,32 150,105" fill="#e5ddd0" stroke="#221f1b" stroke-width="1.5"/>
+        <polygon points="150,105 130,32 225,85" fill="#ece6da" stroke="#221f1b" stroke-width="1.5"/>
+        <!-- Opposite directed half-edges along shared edge -->
+        <line x1="136" y1="96" x2="128" y2="46" stroke="#c2571f" stroke-width="2"/>
+        <line x1="143" y1="46" x2="151" y2="96" stroke="#2f6999" stroke-width="2"/>
+        <!-- Outward normal arrows -->
+        <line x1="105" y1="78" x2="85" y2="55" stroke="#386b42" stroke-width="2"/>
+        <text x="68" y="48" font-size="9" font-family="monospace" font-weight="700" fill="#386b42">n̂ outward</text>
+        <text x="140" y="126" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#48423a">Every edge (u→v) paired with exact reverse (v→u)</text>
+      </svg>
+      <p><b>What it is:</b> Slicers reject STLs with holes, flipped triangles, or self-intersecting bosses. Before export, every part is float32-quantized to <code>0.1 µm</code> and checked that every directed edge matches its reverse, signed volume is positive, and stacked slabs share flush <code>z</code> boundaries without overlapping.</p>
+    </div>
+
+    <!-- Zero Supports & 45 deg Overhang Rule -->
+    <div class="std-card">
+      <div class="std-card-head">
+        <h3>Zero supports &amp; Flat bed orientation</h3>
+        <span class="std-badge">0 supports · ≤ 12 mm bridges</span>
+      </div>
+      <svg class="std-svg" viewBox="0 0 280 140">
+        <!-- Build plate -->
+        <line x1="24" y1="108" x2="256" y2="108" stroke="#221f1b" stroke-width="1.8"/>
+        <!-- Flat part on left -->
+        <rect x="42" y="76" width="84" height="32" fill="#386b42" opacity="0.22" stroke="#386b42" stroke-width="1.8"/>
+        <rect x="66" y="44" width="36" height="32" fill="#386b42" opacity="0.22" stroke="#386b42" stroke-width="1.8"/>
+        <text x="84" y="125" text-anchor="middle" font-size="9.5" font-family="monospace" font-weight="700" fill="#386b42">✓ Flat z=0 base (0 supports)</text>
+        <!-- Bridge keeper on right -->
+        <path d="M164,108 L164,52 L236,52 L236,108 L220,108 L220,68 L180,68 L180,108 Z" fill="#b08b4a" opacity="0.3" stroke="#221f1b" stroke-width="1.6"/>
+        <text x="200" y="42" text-anchor="middle" font-size="9" font-family="monospace" fill="#48423a">≤ 12 mm clean bridge</text>
+        <text x="200" y="125" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#48423a">Captive rack keeper</text>
+      </svg>
+      <p><b>What it is:</b> Every part in the <code>.zip</code> pack and combined bed <code>.stl</code> is pre-oriented with its largest flat face at <code>z = 0</code>. Even multi-tier parts print upwards from a flat base without support material to pry out of tooth roots or bores.</p>
+    </div>
+  </div>
+
   <div class="aside">
-    <p><b>Fits are parametric, not fixed.</b> Each page exposes the clearance and re-cuts every
-      bore and every gap from it. If your printer runs tight, raise it and re-export — the STLs and
-      the sheet both follow.</p>
+    <p><b>Tune once, print everywhere:</b> If your classroom printer extrudes slightly wide, raise the
+      <b>Bore clearance</b> slider on any mechanism page from <code>0.30 mm</code> to <code>0.40 mm</code> and
+      click <b>All Parts (.stl)</b> or <b>Print pack (.zip)</b> — every bore, slot, and rail gap updates in real time.</p>
   </div>
 
-  <h2>3. What counts as printable</h2>
-  <p>Before a page is published, every printed part is mesh-checked. A part is publishable when:</p>
-  <ul>
-    <li>every solid in it is <b>closed</b>: each directed edge is matched by the same number of its
-      reverse, so a slicer sees a closed surface;</li>
-    <li>every solid is <b>wound outwards</b>, proved by a positive signed volume;</li>
-    <li>no two solids in the same part <b>overlap</b> in both height and footprint — stacked bosses
-      may touch a plate, never sink into it, because the slicer's even-odd fill would carve the
-      overlap out of the part;</li>
-    <li>the profile <b>triangulates cleanly</b>: the cap area equals the area the rings enclose, which
-      catches a hole that has drifted across the outline (a real failure that the first version of
-      the cam generator produced);</li>
-    <li>it fits the bed: every part must be smaller than 220 mm in every direction.</li>
-  </ul>
-  <p>The same checks run in three places: in the page (every parameter change), in
-    <code>npm test</code> (at every parameter extreme of every mechanism), and in
-    <code>src/build.js</code> (before the page is written). The exports are float32-quantised to
-    0.1 µm first, so the vertices a slicer sees are bit-identical across a shared edge — the check
-    that the file is watertight is the same check a slicer runs.</p>
-
-  <h2>4. Orientation and supports</h2>
-  <p>Every STL is already in its printing orientation: flat face on the bed, tallest feature up. No
-    part needs supports. Bridges are kept under 16 mm (the rack keepers are 12 mm) and overhangs
-    stay below 50° except where they are short enough to print clean.</p>
-
-  <h2>5. Hardware</h2>
-  <p>Most kits need no bought parts at all: posts and pins are printed and retained by press caps.
-    Where a mechanism needs a real axle or a real servo, the page lists it in <b>Hardware</b> and the
-    sheet counts it. The two standard sizes are Ø3 mm rod (with 0.3 mm running clearance) and Ø2 mm
-    steel pin for the small linkages.</p>
-
-  <h2>6. Mass and time</h2>
-  <p>Each page reports the printed mass from the model's own volume at PLA density
-    (1.24 g/cm³) and the same figure appears in the pack, per part and in total. Add roughly
-    25–30 g per hour of printing on a 0.4 mm nozzle at 0.2 mm layers, 3 perimeters and 25%
-    infill.</p>
-
-  <div class="figure">
-    <b>Where these numbers came from.</b> The 8 mm layer pitch and the 0.3 mm running fit were
-    chosen by printing: a 6 mm link with a 1.6 mm hub clears the plate by the 0.4 mm left over,
-    and a Ø6.8 printed post in a Ø7.1 bore turns freely with no post-processing. Anything looser
-    rattles; anything tighter needs drilling, which defeats the point of a printable kit.
-  </div>
-
-  <p style="margin-top:26px"><a href="../index.html">← Back to the catalogue</a> ·
-    <a href="design-notes.html">How a mechanism is modelled and exported →</a></p>
+  <p style="margin-top:26px">
+    <a href="../index.html">← Back to the Mechanisms &amp; Motors catalogue</a> ·
+    <a href="design-notes.html">How mechanisms are modelled and exported →</a> ·
+    <a href="https://507movements.com/" target="_blank" rel="noopener">507 Mechanical Movements (Henry T. Brown, 1868) ↗</a>
+  </p>
 </main>
 
 <footer class="site">
-  <div class="wrap"><span>Mechanisms — one model per machine, shared by the page, the figure and the STL.</span></div>
+  <div class="wrap">
+    <span>Mechanisms — one parametric model per machine, shared by the 3D stage, Teardown SVG, and STL export.</span>
+    <a href="https://507movements.com/" target="_blank" rel="noopener">Inspired by 507movements.com ↗</a>
+  </div>
 </footer>
 </body>
 </html>
